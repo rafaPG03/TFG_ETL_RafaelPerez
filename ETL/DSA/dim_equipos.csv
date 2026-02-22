@@ -1,0 +1,32 @@
+﻿id_equipo;nombre_equipo;codigo;pais;fundado_en;logo;estadio;direccion;ciudad;capacidad
+529;Barcelona;BAR;Spain;1899;https://media.api-sports.io/football/teams/529.png;Camp Nou;Les Corts, 08028;Barcelona;55926
+530;Atletico Madrid;MAD;Spain;1903;https://media.api-sports.io/football/teams/530.png;Estádio Cívitas Metropolitano;Rosas;Madrid;70460
+531;Athletic Club;BIL;Spain;1898;https://media.api-sports.io/football/teams/531.png;San Mamés Barria;Rafael Moreno Pitxitxi Kalea;Bilbao;53289
+532;Valencia;VAL;Spain;1919;https://media.api-sports.io/football/teams/532.png;Estadio de Mestalla;Avenida de Suecia;Valencia;55000
+533;Villarreal;VIL;Spain;1923;https://media.api-sports.io/football/teams/533.png;Estadio de la Cerámica;Plaza Labrador;Villarreal;24500
+534;Las Palmas;PAL;Spain;1949;https://media.api-sports.io/football/teams/534.png;Estadio de Gran Canaria;Avenida Pío XII 29;Las Palmas de Gran Canaria;32392
+535;Malaga;MAL;Spain;1948;https://media.api-sports.io/football/teams/535.png;Estadio La Rosaleda;Avenida de la Palmilla / Paseo de Martiricos;Málaga;30389
+536;Sevilla;SEV;Spain;1890;https://media.api-sports.io/football/teams/536.png;Estadio Ramón Sánchez Pizjuán;Avenida de Eduardo Dato;Sevilla;48649
+538;Celta Vigo;CEL;Spain;1923;https://media.api-sports.io/football/teams/538.png;Abanca-Balaídos;Avenida de Balaídos;Vigo;31800
+539;Levante;LEV;Spain;1909;https://media.api-sports.io/football/teams/539.png;Estadio Ciudad de Valencia;Calle San Vicente de Paúl 44;Valencia;25534
+540;Espanyol;ESP;Spain;1900;https://media.api-sports.io/football/teams/540.png;Stage Front Stadium;Avenida Baix Llobregat 100;Cornella de Llobregat;40423
+541;Real Madrid;REA;Spain;1902;https://media.api-sports.io/football/teams/541.png;Estadio Santiago Bernabéu;Avenida de Concha Espina 1, Chamartín;Madrid;85454
+543;Real Betis;BET;Spain;1907;https://media.api-sports.io/football/teams/543.png;Estadio Benito Villamarín;Avenida de Heliópolis;Sevilla;60721
+544;Deportivo La Coruna;COR;Spain;1906;https://media.api-sports.io/football/teams/544.png;Estadio Abanca-Riazor;Calle Manuel Murguía;La Coruña;34611
+545;Eibar;EIB;Spain;1940;https://media.api-sports.io/football/teams/545.png;Estadio Municipal de Ipurúa;Calle de Ipurúa;Eibar;8050
+546;Getafe;GET;Spain;1983;https://media.api-sports.io/football/teams/546.png;Estadio Coliseum;Avenida de Teresa de Calcuta;Getafe;17393
+548;Real Sociedad;RSO;Spain;1909;https://media.api-sports.io/football/teams/548.png;Reale Arena;Paseo de Anoeta 1;Donostia-San Sebastián;40000
+715;Granada CF;GRA;Spain;1931;https://media.api-sports.io/football/teams/715.png;Estadio Nuevo Los Cármenes;Calle Pintor Manuel Maldonado;Granada;23156
+728;Rayo Vallecano;RAY;Spain;1924;https://media.api-sports.io/football/teams/728.png;Estadio de Vallecas;Calle Payaso Fofó;Madrid;15500
+731;Sporting Gijon;GIJ;Spain;1905;https://media.api-sports.io/football/teams/731.png;Estadio Municipal El Molinón;Parque de Isabel la Católica;Gijón;29538
+537;Leganes;LEG;Spain;1928;https://media.api-sports.io/football/teams/537.png;Estadio Municipal de Butarque;Calle Arquitectura;Leganés;12450
+542;Alaves;ALA;Spain;1921;https://media.api-sports.io/football/teams/542.png;Estadio de Mendizorroza;Paseo de Cervantes;Vitoria-Gasteiz;19840
+727;Osasuna;OSA;Spain;1920;https://media.api-sports.io/football/teams/727.png;Estadio El Sadar;Carretera El Sadar;Iruñea;23576
+547;Girona;GIR;Spain;1930;https://media.api-sports.io/football/teams/547.png;Estadi Municipal de Montilivi;Avenida Montlivi 141;Girona;14500
+720;Valladolid;VAL;Spain;1928;https://media.api-sports.io/football/teams/720.png;Estadio Municipal José Zorrilla;Avenida del Mundial 82;Valladolid;26512
+726;Huesca;HUE;Spain;1922;https://media.api-sports.io/football/teams/726.png;Estadio El Alcoraz;Camino del Alto Cocorón;Huesca;9128
+798;Mallorca;MAL;Spain;1916;https://media.api-sports.io/football/teams/798.png;Estadi Mallorca Son Moix;Camí dels Reis;Palma de Mallorca;23142
+724;Cadiz;CAD;Spain;1910;https://media.api-sports.io/football/teams/724.png;Estadio Nuevo Mirandilla;Plaza de Madrid;Cádiz;22000
+797;Elche;ELC;Spain;1923;https://media.api-sports.io/football/teams/797.png;Estadio Manuel Martínez Valero;Avenida Manuel Martínez Valero 3;Elche;36017
+723;Almeria;ALM;Spain;1989;https://media.api-sports.io/football/teams/723.png;Power Horse Stadium – Estadio de los Juegos Mediterráneos;Calle de Belladona;Almería;21350
+718;Oviedo;OVI;Spain;1926;https://media.api-sports.io/football/teams/718.png;Estadio Nuevo Carlos Tartiere;C. Isidro Lángara;Oviedo;30500
