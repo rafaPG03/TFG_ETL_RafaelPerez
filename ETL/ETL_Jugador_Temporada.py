@@ -69,6 +69,7 @@ def procesar_stats_jugadores():
                         "faltas_cometidas": stat.get('fouls', {}).get('commited'),
                         "regates_intentados": stat.get('dribbles', {}).get('attempts'),
                         "regates_exito": stat.get('dribbles', {}).get('success'),
+                        "regateado": stat.get('dribbles', {}).get('past'),
                         "amarillas": stat.get('cards', {}).get('yellow'),
                         "rojas": stat.get('cards', {}).get('red'),
                         "penaltis_marcados": stat.get('penalty', {}).get('scored'),
@@ -92,11 +93,6 @@ def procesar_stats_jugadores():
 
     for col in cols_para_enteros:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
-
-        # Convierte a entero que soporta nulos (Int64)
-    df['edad'] = pd.to_numeric(df['edad'], errors='coerce').astype('Int64')
-    df['altura'] = pd.to_numeric(df['altura'], errors='coerce').astype('Int64')
-    df['peso'] = pd.to_numeric(df['peso'], errors='coerce').astype('Int64')
 
     # Guardar CSV
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')

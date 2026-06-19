@@ -61,6 +61,7 @@ def procesar_jugadores_partido():
                                 
                                 # Estadísticas clave
                                 "goles": stat.get("goals", {}).get("total"),
+                                "penaltis_marcados": stat.get('penalty', {}).get('scored'),
                                 "asistencias": stat.get("goals", {}).get("assists"),
                                 "paradas": stat.get("goals", {}).get("saves"),
                                 "goles_concedidos": stat.get("goals", {}).get("conceded"),
@@ -71,6 +72,9 @@ def procesar_jugadores_partido():
                                 "precision_pases": str(stat.get("passes", {}).get("accuracy", "0")).replace('%', ''),
                                 "regates_intentados": stat.get("dribbles", {}).get("attempts"),
                                 "regates": stat.get("dribbles", {}).get("success"),
+                                "regateado": stat.get("dribbles", {}).get("past"),
+                                "duelos_totales": stat.get("duels", {}).get("total"),
+                                "duelos_ganados": stat.get("duels", {}).get("won"),
                                 "faltas_cometidas": stat.get("fouls", {}).get("committed"),
                                 "faltas_recibidas": stat.get("fouls", {}).get("drawn"),
                                 "entradas": stat.get("tackles", {}).get("total"),
@@ -94,7 +98,7 @@ def procesar_jugadores_partido():
         "id_partido", "id_jugador", "id_equipo", "minutos", "goles", "asistencias", 
         "paradas", "tiros_totales", "tiros_a_puerta", "pases_totales", "pases_clave", 
         "precision_pases", "faltas_cometidas", "faltas_recibidas", "amarilla", "roja", "penaltis_parados", "intercepciones",
-        "bloqueos", "entradas", "regates_intentados", "regates", "goles_concedidos"
+        "bloqueos", "entradas", "regates_intentados", "regates", "goles_concedidos","duelos_totales", "duelos_ganados", "regateado"
     ]
     
     for col in cols_enteros:

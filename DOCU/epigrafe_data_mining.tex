@@ -1,0 +1,162 @@
+% Epigrafe de Data Mining para TFG (Overleaf)
+
+\section{Data Mining en la aplicacion}
+Este epigrafe documenta con mayor detalle las aplicaciones de data mining de la app, las tecnicas utilizadas, su implementacion practica y los resultados generados en CSV. El objetivo es justificar las decisiones metodologicas y mostrar de forma clara el valor analitico que se aporta en la capa de datos. Los scripts se ubican en \texttt{DATA\_MINING/SCRIPTS} y los resultados en \texttt{DATA\_MINING/DSA\_DM}.
+
+\section{Fundamentos teoricos de las tecnicas}
+En esta seccion se presenta el marco teorico que sustenta las tecnicas aplicadas. Se explica el objetivo de cada tecnica, su funcionamiento basico y el motivo por el que es adecuada en el contexto del futbol.
+
+\subsection{Z-score y deteccion de desviaciones}
+El z-score es una medida estandarizada que expresa cuantas desviaciones tipicas se aleja un valor de su media. Se define como $z = (x - \mu) / \sigma$. En un contexto de analitica deportiva permite identificar comportamientos atipicos en estadisticas de equipo (posesion, xG, tiros, precision), comparando el rendimiento reciente con una referencia global. El uso de umbrales negativos detecta debilidades (rendimiento por debajo de la media) y los positivos alertan de vulnerabilidades defensivas.
+
+\subsection{Reglas jerarquicas y sistemas de decision}
+Las reglas jerarquicas priorizan condiciones para evitar contradicciones y garantizar coherencia semantica. Primero se evalua el defecto mas critico y el resto de reglas se aplican solo si no hay conflicto. Este enfoque es apropiado cuando se combinan indicadores que pueden describir problemas opuestos (por ejemplo, falta de posesion versus juego esteril). La salida es interpretable y facilita la explicacion en un informe.
+
+\subsection{Ponderacion temporal exponencial}
+La ponderacion temporal asigna mayor peso a los eventos recientes para reflejar mejor la forma actual. Se usa un factor de decaimiento $\alpha$ con $0 < \alpha < 1$ para reducir la influencia de partidos antiguos. Es habitual en series temporales cuando la estacionariedad no esta garantizada y se quiere capturar momentum competitivo.
+
+\subsection{Ajustes por xG y factores de suerte}
+El xG (expected goals) estima la probabilidad de marcar a partir de la calidad de las ocasiones. Comparar xG con goles reales permite detectar partidos donde el resultado se aleja del rendimiento esperado, lo que se interpreta como suerte o infortunio. Este ajuste suaviza el impacto del marcador y da una lectura mas estable de la forma real.
+
+\subsection{Random Forest para clasificacion 1X2}
+Random Forest es un ensemble de arboles de decision entrenados sobre subconjuntos de datos y variables. Su principal ventaja es la capacidad de capturar relaciones no lineales y reducir el sobreajuste mediante promedios. En prediccion 1X2 se trata un problema multiclase (victoria local, empate, victoria visitante) con variables de forma reciente y stats de temporada.
+
+\subsection{Simulacion Monte Carlo}
+La simulacion Monte Carlo genera multiples escenarios posibles muestreando resultados segun probabilidades estimadas. Con suficientes iteraciones se obtiene una distribucion de posiciones finales, util para calcular probabilidades de campeon, Champions o descenso. Es una tecnica adecuada cuando hay incertidumbre y se dispone de probabilidades por evento.
+
+\subsection{Clustering y similitud coseno}
+El clustering agrupa jugadores en perfiles estadisticos similares. El escalado z-score normaliza las variables para evitar que una feature domine. K-Means busca centroides que minimizan la variacion intra-cluster. La similitud coseno mide el angulo entre vectores y permite comparar perfiles independientemente de la magnitud, lo que favorece comparaciones por estilo de juego.
+
+\subsection{Normalizacion y percentiles}
+La normalizacion al rango 0--10 facilita la comparacion entre temporadas. El percentil indica la posicion relativa de un jugador en una stat respecto al resto de la liga. Estas transformaciones mejoran la interpretabilidad para usuarios no tecnicos y son utiles en dashboards.
+
+\subsection{Analisis de aspectos a mejorar por equipo}
+\textbf{Script:} \texttt{aspectos\_a\_mejorar.py}.\newline
+\textbf{Tecnicas:} z-score para detectar desviaciones sobre la media, reglas jerarquicas para evitar contradicciones, y filtro por ultimos $N=10$ partidos.\newline
+\textbf{Implementacion:} se leen estadisticas de equipo desde PostgreSQL (posesion, xG, tiros, precision y pases). Se calculan media y desviacion estandar global para construir el z-score de cada metrica. A partir de esos valores se aplican reglas ordenadas por prioridad: control de balon, juego esteril, eficiencia ofensiva, vulnerabilidad defensiva y precision tecnica. La severidad se estima por el numero de defectos detectados, lo que permite identificar equipos con multiples problemas simultaneos.
+
+\textbf{Salida:} \texttt{ASPECTOS\_A\_MEJORAR.csv} con columnas \texttt{id\_equipo, nombre\_equipo, vulnerabilidad, severidad}.
+
+\subsection{Estado de forma de equipos}
+\textbf{Script:} \texttt{Estado\_formaV2.py}.\newline
+\textbf{Tecnicas:} ponderacion temporal exponencial, bonus por rival top-6, ajuste por xG (suerte) y normalizacion a escala 0--10.\newline
+\textbf{Implementacion:} se agregan los ultimos $N=5$ partidos por equipo de la temporada objetivo. Cada partido se convierte en una puntuacion base por resultado, que se corrige con xG (si el rendimiento real fue mejor o peor de lo esperado) y se incrementa con un bonus si el rival es top-6. La puntuacion final se normaliza y se clasifica en estados para facilitar la lectura en la app.
+
+\textbf{Salida:} \texttt{ESTADO\_FORMA\_EQUIPOS\_2025.csv} con columnas \texttt{id\_equipo, nombre\_equipo, puntuacion\_forma, estado, tendencia, variabilidad}.
+
+\subsection{Estado de forma de jugadores}
+\textbf{Script:} \texttt{forma\_jugadorv2.py}.\newline
+\textbf{Tecnicas:} score unificado por posicion, comparacion entre media de temporada y media reciente, y umbrales de evolucion.\newline
+\textbf{Implementacion:} se calcula un score por partido que combina nota y acciones con pesos por posicion. Este score se promedia para obtener la media de temporada y la media reciente (ultimos 7 partidos). La diferencia entre ambas determina el estado (alto, estable o bajo), y se controla que el jugador tenga minutos suficientes para evitar sesgos.
+
+\textbf{Salida:} \texttt{ESTADO\_FORMA\_JUGADORES\_2025.csv} con columnas \texttt{id\_jugador, nombre\_jugador, id\_equipo, estado, score\_temporada, score\_reciente, evolucion}.
+
+\subsection{Probables goleadores por partido}
+\textbf{Script:} \texttt{prob\_goleadores.py}.\newline
+\textbf{Tecnicas:} combinacion lineal de forma reciente, promedio de goles en temporada y goles historicos contra el rival, pasada por una sigmoide para convertir a probabilidad.\newline
+\textbf{Implementacion:} se trabaja solo con jugadores activos en la plantilla 2025 para cada equipo. Se construye un score logit con forma reciente, ratio de goles/partido y goles frente al rival, y se convierte a probabilidad mediante una sigmoide escalada. Se capan valores extremos para evitar estimaciones irreales y se exporta el top-3 por equipo.
+
+\textbf{Salida:} \texttt{PROBABLES\_GOLEADORES.csv} con columnas \texttt{id\_partido, id\_equipo, id\_jugador, nombre\_jugador, probabilidad}.
+
+\subsection{Prediccion de partidos incompletos}
+\textbf{Script:} \texttt{v2prediccionesESTAES.py}.\newline
+\textbf{Tecnicas:} Random Forest multiclase (1X2), features de forma reciente (ultimos 5/10) y features de temporada.\newline
+\textbf{Implementacion:} se construye un historico por equipo con goles, puntos y condicion local/visitante. Se generan features de tendencia reciente y stats de temporada agregadas al momento mas actual. El modelo se entrena con partidos completados y produce probabilidades calibradas para partidos incompletos.
+
+\textbf{Salida:} \texttt{predicciones\_partidos\_incompletos.csv} con columnas \texttt{fecha, id\_partido, id\_local, nombre\_local, id\_visitante, nombre\_visitante, prob\_victoria\_local, prob\_empate, prob\_victoria\_visitante, prediccion}.
+
+\subsection{Simulacion Monte Carlo de clasificacion}
+\textbf{Script:} \texttt{simulacion\_montecarlo\_laliga.py}.\newline
+\textbf{Tecnicas:} simulacion Monte Carlo con $N=10000$ iteraciones, muestreo por probabilidades 1X2 y desempate por diferencia de goles simulada.\newline
+\textbf{Implementacion:} se leen probabilidades de partidos pendientes y la tabla actual. En cada iteracion se simulan resultados con un muestreo aleatorio y se actualizan puntos y diferencia de goles. Finalmente se contabiliza la frecuencia de cada rango de clasificacion para estimar probabilidades.
+
+\textbf{Salida:} \texttt{simulacion\_montecarlo\_laliga\_resultados.csv} con columnas \texttt{id\_equipo, equipo, campeon\_\%, champions\_\%, europa\_\%, media\_tabla\_\%, descenso\_\%}.
+
+\subsection{Perfil estadistico de jugadores}
+\textbf{Script:} \texttt{ratings.py}.\newline
+\textbf{Tecnicas:} indices compuestos por categoria (ataque, creacion, defensa, porteros, duelos, regates), normalizacion por temporada y percentiles relativos.\newline
+\textbf{Implementacion:} se agregan estadisticas de \texttt{h\_jugador\_temporada} para calcular indicadores por categoria con ponderaciones. Se normaliza al rango 0--10 por temporada y se calculan percentiles para interpretar el valor relativo del jugador.
+
+\textbf{Salida:} \texttt{perfil\_estadistico\_jugadores.csv} con columnas \texttt{id\_jugador, temporada, nombre, ataque, creacion, defensa, porteros, duelos, regates, percentil\_ataque, percentil\_creacion, percentil\_defensa, percentil\_porteros, percentil\_duelos, percentil\_regates}.
+
+\subsection{Carga de perfil a PostgreSQL}
+\textbf{Script:} \texttt{cargar\_perfil\_estadistico\_jugadores.py}.\newline
+\textbf{Tecnicas:} ETL con \texttt{COPY} y \texttt{UPSERT} sobre clave primaria compuesta.\newline
+\textbf{Implementacion:} se crea la tabla objetivo si no existe y se inserta el CSV en una tabla temporal. Posteriormente se realiza un \texttt{ON CONFLICT DO UPDATE} con clave \texttt{(id\_jugador, temporada)} para mantener un historico consistente.
+
+\subsection{Similitud entre jugadores}
+\textbf{Script:} \texttt{similitud\_jugadores.py}.\newline
+\textbf{Tecnicas:} clustering K-Means (implementacion propia), escalado z-score, similitud coseno y filtrado por posicion principal.\newline
+\textbf{Implementacion:} se leen perfiles de jugadores desde BD, se normalizan las variables, se generan clusters con una regla heuristica para $k$ y se calculan similitudes coseno. La recomendacion final respeta la posicion principal del jugador.
+\textbf{Salida:} \texttt{jugadores\_similares\_top5.csv} con columnas por jugador y sus 5 mas similares.
+
+\subsection{Resultados generados (tabla de ejemplos)}
+La Tabla~\ref{tab:resultados-dm} incluye un ejemplo representativo de cada CSV generado. Se muestran pocas filas para ilustrar el formato y el tipo de informacion consumida por la app.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{3.1cm} p{1.9cm} p{9.2cm}}
+\hline
+\textbf{Archivo} & \textbf{Ejemplo (clave)} & \textbf{Fila ejemplo} \\
+\hline
+ASPECTOS\_A\_MEJORAR.csv & id\_equipo=529 & Barcelona; Rendimiento equilibrado; severidad Media \\
+ESTADO\_FORMA\_EQUIPOS\_2025.csv & id\_equipo=541 & Real Madrid; puntuacion 10.0; estado Positivo \\
+ESTADO\_FORMA\_JUGADORES\_2025.csv & id\_jugador=734 & Dela; Rendimiento Alto; evolucion 0.37 \\
+perfil\_estadistico\_jugadores.csv & id\_jugador=9 & Achraf Hakimi; ataque 1.47; duelos 6.8; percentil\_regates 94.61 \\
+predicciones\_partidos\_incompletos.csv & id\_partido=1391032 & Espanyol vs Alaves; 65.58/17.87/16.55; Victoria local \\
+PROBABLES\_GOLEADORES.csv & id\_partido=1391032 & Pere Milla; probabilidad 0.418 \\
+simulacion\_montecarlo\_laliga\_resultados.csv & id\_equipo=541 & Real Madrid; campeon 49.75\%; champions 100\% \\
+\hline
+\end{tabular}
+\caption{Ejemplos de resultados generados por cada aplicacion de data mining.}
+\label{tab:resultados-dm}
+\end{table}
+
+\section{Codigo fuente (listo para pegar completo)}
+Se dejan bloques preparados para pegar el codigo completo de cada script. En Overleaf se recomienda \texttt{listings} o \texttt{minted} para formateo y resaltado.
+
+\subsection{aspectos\_a\_mejorar.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: aspectos_a_mejorar.py
+\end{lstlisting}
+
+\subsection{Estado\_formaV2.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: Estado_formaV2.py
+\end{lstlisting}
+
+\subsection{forma\_jugadorv2.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: forma_jugadorv2.py
+\end{lstlisting}
+
+\subsection{prob\_goleadores.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: prob_goleadores.py
+\end{lstlisting}
+
+\subsection{v2prediccionesESTAES.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: v2prediccionesESTAES.py
+\end{lstlisting}
+
+\subsection{simulacion\_montecarlo\_laliga.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: simulacion_montecarlo_laliga.py
+\end{lstlisting}
+
+\subsection{ratings.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: ratings.py
+\end{lstlisting}
+
+\subsection{cargar\_perfil\_estadistico\_jugadores.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: cargar_perfil_estadistico_jugadores.py
+\end{lstlisting}
+
+\subsection{similitud\_jugadores.py}
+\begin{lstlisting}[language=Python]
+% Pegar aqui el script completo: similitud_jugadores.py
+\end{lstlisting}

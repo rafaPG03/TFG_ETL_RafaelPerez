@@ -1,0 +1,19 @@
+﻿player.id;player.name;player.firstname;player.lastname;player.age;player.birth.date;player.birth.place;player.birth.country;player.nationality;player.height;player.weight;player.number;player.position;player.photo
+47003;Momo;Jerónimo;Figueroa Cabrera;43.0;1982-07-15;Las Palmas de Gran Canaria;Spain;Spain;178 cm;68 kg;;Midfielder;https://media.api-sports.io/football/players/47003.png
+35834;Nicolás Pareja;;;;;;;;;;;;https://media.api-sports.io/football/players/35834.png
+104624;Samu García;;;;;;;;;;;;https://media.api-sports.io/football/players/104624.png
+46767;Sergio Sánchez;;;;;;;;;;;;https://media.api-sports.io/football/players/46767.png
+104867;Pelayo Suárez;Pelayo;Suárez López;27.0;1998-07-09;Gijón;Spain;Spain;183 cm;84 kg;20.0;Defender;https://media.api-sports.io/football/players/104867.png
+80891;Wu Hang;Hang;Wu;33.0;1993-02-01;;China PR;China PR;175 cm;65 kg;;Defender;https://media.api-sports.io/football/players/80891.png
+80848;Gen Zhang;Gen;Zhang;38.0;1987-05-05;;China PR;China PR;175 cm;70 kg;;Midfielder;https://media.api-sports.io/football/players/80848.png
+104837;M. Demichelis;Martín Gastón;Demichelis;45.0;1980-12-20;Justiniano Posse;Argentina;Argentina;184 cm;79 kg;;Defender;https://media.api-sports.io/football/players/104837.png
+89886;André Zambo Anguissa;André Zambo;Anguissa;30.0;1995-11-16;;Cameroon;Cameroon;;;;Midfielder;https://media.api-sports.io/football/players/89886.png
+107147;Brahima Fati;Brahima;Fati;27.0;1998-08-03;Bissau;Guinea-Bissau;Guinea-Bissau;176 cm;;;Midfielder;https://media.api-sports.io/football/players/107147.png
+156480;Victor Gómez;;;;;;;;;;;;https://media.api-sports.io/football/players/156480.png
+157910;Paulo Rodrigues;Paulo;Rodrigues Ivo;45.0;1981-02-18;Maceió;Brazil;Brazil;;;;Defender;https://media.api-sports.io/football/players/157910.png
+181868;Manuel Sánchez Sánchez;Manuel;Sánchez Sánchez;;;;Spain;Spain;;;;Midfielder;https://media.api-sports.io/football/players/181868.png
+195164;Javier Sánchez Moreno;Javier;Sánchez Moreno;0.0;2026-02-20;Santa Cruz de La Sierra;Bolivia;Bolivia;;;;Midfielder;https://media.api-sports.io/football/players/195164.png
+75908;Ezequiel Rodríguez;Ezequiel;Rodríguez;29.0;1996-03-25;Rosario;Argentina;Argentina;;;;Attacker;https://media.api-sports.io/football/players/75908.png
+30406;Tòfol Montiel;Cristóbal;Montiel Rodríguez;25.0;2000-04-11;Palma de Mallorca;Spain;Spain;178 cm;64 kg;8.0;Midfielder;https://media.api-sports.io/football/players/30406.png
+496425;Lucas García;;;;;;;;;;;;https://media.api-sports.io/football/players/496425.png
+352854;Guillermo Ruiz;Guillermo;Ruiz Ortiz;22.0;2003-12-09;Madrid;Spain;Spain;194 cm;;27.0;Goalkeeper;https://media.api-sports.io/football/players/352854.png

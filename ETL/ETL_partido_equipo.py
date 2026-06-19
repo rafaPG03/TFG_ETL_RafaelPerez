@@ -13,6 +13,7 @@ MAPEO_STATS = {
     "Total Shots": "tiros_totales",
     "Shots insidebox": "tiros_en_area",
     "Shots outsidebox": "tiros_fuera_area",
+    "Fouls": "faltas_cometidas",
     "Corner Kicks": "corners",
     "Offsides": "fueras_de_juego",
     "Ball Possession": "posesion",

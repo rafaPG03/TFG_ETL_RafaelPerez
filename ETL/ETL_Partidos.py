@@ -6,18 +6,44 @@ import os
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA" 
 CARPETA_PARTIDOS = os.path.join(RUTA_BASE, "partidos_base")
-ARCHIVO_SALIDA = os.path.join(DSA, "dim_partidos.csv")
+ARCHIVO_SALIDA = os.path.join(DSA, "dim_partidos2.csv")
 
-def determinar_ganador(p):
-    home_name = p['teams']['home']['name']
-    away_name = p['teams']['away']['name']
+def es_partido_acabado(p):
+    """Verifica si un partido está completado."""
+    try:
+        # Verificar que existen los campos necesarios
+        if not p.get('fixture') or not p.get('teams') or not p.get('goals'):
+            return False
+        
+        # Verificar que fixture tiene datos completos
+        if not p['fixture'].get('id') or not p['fixture'].get('date'):
+            return False
+        
+        # Verificar que teams tiene datos completos
+        if (not p['teams'].get('home') or not p['teams'].get('away') or
+            not p['teams']['home'].get('id') or not p['teams']['away'].get('id')):
+            return False
+        
+        # Verificar que goals tiene datos válidos (aunque sean 0)
+        if p['goals'].get('home') is None or p['goals'].get('away') is None:
+            return False
+        
+        return True
+    except (KeyError, TypeError):
+        return False
+
+def determinar_ganador(p, acabado):
+    """Determina el ganador. Retorna None si el partido no está acabado."""
+    if not acabado:
+        return None
+    
     home_win = p['teams']['home']['winner']
     away_win = p['teams']['away']['winner']
 
     if home_win is True:
-        return home_name
+        return p['teams']['home']['name']
     elif away_win is True:
-        return away_name
+        return p['teams']['away']['name']
     else:
         return "Empate"
 
@@ -32,18 +58,48 @@ def procesar_partidos():
         with open(ruta_completa, 'r', encoding='utf-8') as f:
             data = json.load(f)
             for p in data:
+                acabado = es_partido_acabado(p)
+                
+                # Extraer datos según si el partido está acabado o no
+                if acabado:
+                    id_partido = p['fixture']['id']
+                    arbitro = p['fixture']['referee']
+                    fecha = p['fixture']['date']
+                    estadio = p['fixture']['venue']['name']
+                    jornada = p['league']['round']
+                    temporada = p['league']['season']
+                    id_local = p['teams']['home']['id']
+                    id_visitante = p['teams']['away']['id']
+                    ganador = determinar_ganador(p, acabado)
+                    goles_local = p['goals']['home']
+                    goles_visitante = p['goals']['away']
+                else:
+                    # Para partidos incompletos, intentamos obtener lo que podamos
+                    id_partido = p.get('fixture', {}).get('id')
+                    arbitro = p.get('fixture', {}).get('referee')
+                    fecha = p.get('fixture', {}).get('date')
+                    estadio = p.get('fixture', {}).get('venue', {}).get('name')
+                    jornada = p.get('league', {}).get('round')
+                    temporada = p.get('league', {}).get('season')
+                    id_local = p.get('teams', {}).get('home', {}).get('id')
+                    id_visitante = p.get('teams', {}).get('away', {}).get('id')
+                    ganador = None
+                    goles_local = None
+                    goles_visitante = None
+                
                 fila = {
-                    "id_partido": p['fixture']['id'],
-                    "arbitro": p['fixture']['referee'],
-                    "fecha": p['fixture']['date'],
-                    "estadio": p['fixture']['venue']['name'],
-                    "jornada": p['league']['round'],
-                    "temporada": p['league']['season'],
-                    "id_local": p['teams']['home']['id'],
-                    "id_visitante": p['teams']['away']['id'],
-                    "ganador": determinar_ganador(p),
-                    "goles_local": p['goals']['home'],
-                    "goles_visitante": p['goals']['away']
+                    "id_partido": id_partido,
+                    "arbitro": arbitro,
+                    "fecha": fecha,
+                    "estadio": estadio,
+                    "jornada": jornada,
+                    "temporada": temporada,
+                    "id_local": id_local,
+                    "id_visitante": id_visitante,
+                    "ganador": ganador,
+                    "goles_local": goles_local,
+                    "goles_visitante": goles_visitante,
+                    "status": "Completado" if acabado else "Incompleto"
                 }
                 all_data.append(fila)
 
@@ -55,19 +111,24 @@ def procesar_partidos():
     df['arbitro'] = df['arbitro'].str.replace(", Spain", "", case=False, regex=False)
 
     # Dejamos solo el número en Jornada (Extrae los dígitos al final del texto)
-    df['jornada'] = df['jornada'].str.extract('(\d+)').astype(int)
+    df['jornada'] = df['jornada'].str.extract('(\d+)', expand=False).astype('Int64')
 
-    # ConvertiMOS goles a Entero (rellenando nulos con 0 por si acaso)
-    df['goles_local'] = df['goles_local'].fillna(0).astype(int)
-    df['goles_visitante'] = df['goles_visitante'].fillna(0).astype(int)
+    # Convertimos goles a entero nullable para evitar que se exporten como float.
+    df['goles_local'] = pd.to_numeric(df['goles_local'], errors='coerce').astype('Int64')
+    df['goles_visitante'] = pd.to_numeric(df['goles_visitante'], errors='coerce').astype('Int64')
 
-    # Formateamos Fecha
-    df['fecha'] = pd.to_datetime(df['fecha']).dt.strftime('%Y-%m-%d %H:%M')
+    # Formateamos Fecha (solo para fechas válidas)
+    df['fecha'] = pd.to_datetime(df['fecha'], errors='coerce').dt.strftime('%Y-%m-%d %H:%M')
 
     # Guardar en CSV
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     
-    print(f"✅ ETL Completado. Se han procesado {len(df)} registros de equipos.")
+    completados = (df['status'] == 'Completado').sum()
+    incompletos = (df['status'] == 'Incompleto').sum()
+    
+    print(f"✅ ETL Completado. Se han procesado {len(df)} registros de partidos.")
+    print(f"   - Partidos Completados: {completados}")
+    print(f"   - Partidos Incompletos: {incompletos}")
     print(f"📂 Archivo guardado en: {ARCHIVO_SALIDA}")
 
 if __name__=="__main__":

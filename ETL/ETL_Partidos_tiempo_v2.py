@@ -3,12 +3,12 @@ import os
 
 # --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA"
-ARCHIVO_PARTIDOS = os.path.join(RUTA_BASE, "dim_partidos.csv")
+ARCHIVO_PARTIDOS = os.path.join(RUTA_BASE, "dim_partidos2.csv")
 ARCHIVO_TIEMPO = os.path.join(RUTA_BASE, "dim_tiempo.csv")
 
 
-def limpiar_dim_tiempo():
-    """Elimina duplicados por día y mantiene solo atributos del día"""
+""" def limpiar_dim_tiempo():
+    Elimina duplicados por día y mantiene solo atributos del día
     
     df_tiempo = pd.read_csv(ARCHIVO_TIEMPO, sep=';')
     
@@ -22,7 +22,7 @@ def limpiar_dim_tiempo():
     # Guardar en CSV
     df_final.to_csv(ARCHIVO_TIEMPO, index=False, sep=';', encoding='utf-8-sig')
     
-    print(f"✅ dim_tiempo limpiada. Registros únicos: {len(df_final)}")
+    print(f"✅ dim_tiempo limpiada. Registros únicos: {len(df_final)}") """
 
 
 def preparar_dim_partidos():
@@ -32,9 +32,16 @@ def preparar_dim_partidos():
     df_partidos = pd.read_csv(ARCHIVO_PARTIDOS, sep=';')
     
     # Procesamos fecha: extraer id_tiempo (YYYYMMDD) y hora (HH:MM)
-    df_partidos['fecha'] = pd.to_datetime(df_partidos['fecha'])
-    df_partidos['id_tiempo'] = df_partidos['fecha'].dt.strftime('%Y%m%d').astype(int)
+    df_partidos['fecha'] = pd.to_datetime(df_partidos['fecha'], errors='coerce')
+    df_partidos['id_tiempo'] = pd.to_numeric(
+        df_partidos['fecha'].dt.strftime('%Y%m%d'), errors='coerce'
+    ).astype('Int64')
     df_partidos['hora'] = df_partidos['fecha'].dt.strftime('%H:%M')
+
+    # Aseguramos que los goles se mantengan como enteros nullable al reescribir el CSV.
+    for col in ['goles_local', 'goles_visitante']:
+        if col in df_partidos.columns:
+            df_partidos[col] = pd.to_numeric(df_partidos[col], errors='coerce').astype('Int64')
     
     # Eliminamos columna fecha original
     df_partidos = df_partidos.drop(columns=['fecha','jornada'])
@@ -51,6 +58,6 @@ def preparar_dim_partidos():
 
 
 if __name__ == "__main__":
-    limpiar_dim_tiempo()
+    """ limpiar_dim_tiempo() """
     preparar_dim_partidos()
     print("\n✅ Proceso completado exitosamente")

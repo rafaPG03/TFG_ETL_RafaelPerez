@@ -1,0 +1,295 @@
+﻿id_equipo;nombre_equipo;temporada;necesidad;motivo;umbral_pct
+529;Barcelona;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+533;Villarreal;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+534;Las Palmas;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+535;Malaga;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+535;Malaga;2015;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+536;Sevilla;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+538;Celta Vigo;2015;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+539;Levante;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+539;Levante;2015;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+540;Espanyol;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+540;Espanyol;2015;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+540;Espanyol;2015;Central;Defensas con bajos aportes defensivos y muchos goles encajados;0.1
+541;Real Madrid;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+543;Real Betis;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2015;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+543;Real Betis;2015;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+544;Deportivo La Coruna;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+544;Deportivo La Coruna;2015;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+545;Eibar;2015;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+546;Getafe;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+548;Real Sociedad;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+548;Real Sociedad;2015;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+715;Granada CF;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+715;Granada CF;2015;Central;Defensas con bajos aportes defensivos y muchos goles encajados;0.1
+728;Rayo Vallecano;2015;Sin necesidad clara;Sin senales negativas relevantes;0.1
+731;Sporting Gijon;2015;Delantero;Pocos goles respecto a la media de la liga;0.1
+529;Barcelona;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2016;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+533;Villarreal;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+534;Las Palmas;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+535;Malaga;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+535;Malaga;2016;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+536;Sevilla;2016;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+537;Leganes;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+537;Leganes;2016;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+538;Celta Vigo;2016;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+540;Espanyol;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+541;Real Madrid;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+544;Deportivo La Coruna;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+544;Deportivo La Coruna;2016;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+545;Eibar;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+548;Real Sociedad;2016;Sin necesidad clara;Sin senales negativas relevantes;0.1
+715;Granada CF;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+727;Osasuna;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+731;Sporting Gijon;2016;Delantero;Pocos goles respecto a la media de la liga;0.1
+731;Sporting Gijon;2016;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+529;Barcelona;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+532;Valencia;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+533;Villarreal;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+534;Las Palmas;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+534;Las Palmas;2017;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+535;Malaga;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+535;Malaga;2017;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+536;Sevilla;2017;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+537;Leganes;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+538;Celta Vigo;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+539;Levante;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+540;Espanyol;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+541;Real Madrid;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2017;Sin necesidad clara;Sin senales negativas relevantes;0.1
+544;Deportivo La Coruna;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+544;Deportivo La Coruna;2017;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+545;Eibar;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+545;Eibar;2017;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+546;Getafe;2017;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2017;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+546;Getafe;2017;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+547;Girona;2017;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+548;Real Sociedad;2017;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+529;Barcelona;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+532;Valencia;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+533;Villarreal;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+537;Leganes;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+538;Celta Vigo;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+539;Levante;2018;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+540;Espanyol;2018;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+541;Real Madrid;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2018;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+545;Eibar;2018;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+546;Getafe;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+547;Girona;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+548;Real Sociedad;2018;Sin necesidad clara;Sin senales negativas relevantes;0.1
+720;Valladolid;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2018;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+720;Valladolid;2018;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+726;Huesca;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+726;Huesca;2018;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+728;Rayo Vallecano;2018;Delantero;Pocos goles respecto a la media de la liga;0.1
+529;Barcelona;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+532;Valencia;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+533;Villarreal;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+537;Leganes;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+538;Celta Vigo;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+539;Levante;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+540;Espanyol;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+540;Espanyol;2019;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+541;Real Madrid;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+545;Eibar;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+545;Eibar;2019;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+546;Getafe;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+548;Real Sociedad;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+715;Granada CF;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+720;Valladolid;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2019;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+727;Osasuna;2019;Sin necesidad clara;Sin senales negativas relevantes;0.1
+798;Mallorca;2019;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2019;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+798;Mallorca;2019;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+529;Barcelona;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+533;Villarreal;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+538;Celta Vigo;2020;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+538;Celta Vigo;2020;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+539;Levante;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+541;Real Madrid;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+542;Alaves;2020;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+542;Alaves;2020;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+543;Real Betis;2020;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+545;Eibar;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2020;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+546;Getafe;2020;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+546;Getafe;2020;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+548;Real Sociedad;2020;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+715;Granada CF;2020;Sin necesidad clara;Sin senales negativas relevantes;0.1
+720;Valladolid;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2020;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+724;Cadiz;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+724;Cadiz;2020;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+724;Cadiz;2020;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+726;Huesca;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+726;Huesca;2020;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+727;Osasuna;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+727;Osasuna;2020;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+797;Elche;2020;Delantero;Pocos goles respecto a la media de la liga;0.1
+529;Barcelona;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2021;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+533;Villarreal;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2021;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+538;Celta Vigo;2021;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+539;Levante;2021;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+540;Espanyol;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+541;Real Madrid;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+542;Alaves;2021;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+542;Alaves;2021;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+543;Real Betis;2021;Sin necesidad clara;Sin senales negativas relevantes;0.1
+546;Getafe;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2021;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+548;Real Sociedad;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+715;Granada CF;2021;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+724;Cadiz;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+724;Cadiz;2021;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+724;Cadiz;2021;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+727;Osasuna;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+728;Rayo Vallecano;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+797;Elche;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2021;Delantero;Pocos goles respecto a la media de la liga;0.1
+529;Barcelona;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2022;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+531;Athletic Club;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+533;Villarreal;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2022;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+538;Celta Vigo;2022;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+540;Espanyol;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+541;Real Madrid;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+543;Real Betis;2022;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+546;Getafe;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2022;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+547;Girona;2022;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+548;Real Sociedad;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+720;Valladolid;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2022;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+723;Almeria;2022;Sin necesidad clara;Sin senales negativas relevantes;0.1
+724;Cadiz;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+724;Cadiz;2022;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+724;Cadiz;2022;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+727;Osasuna;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+728;Rayo Vallecano;2022;Central;Defensas con bajos aportes defensivos y muchos goles encajados;0.1
+728;Rayo Vallecano;2022;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+797;Elche;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2022;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2022;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+529;Barcelona;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+533;Villarreal;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+534;Las Palmas;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+536;Sevilla;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+538;Celta Vigo;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+541;Real Madrid;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+542;Alaves;2023;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+543;Real Betis;2023;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+546;Getafe;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+547;Girona;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+548;Real Sociedad;2023;Sin necesidad clara;Sin senales negativas relevantes;0.1
+715;Granada CF;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+723;Almeria;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+724;Cadiz;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+724;Cadiz;2023;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+724;Cadiz;2023;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+727;Osasuna;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+727;Osasuna;2023;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+727;Osasuna;2023;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+728;Rayo Vallecano;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+728;Rayo Vallecano;2023;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+798;Mallorca;2023;Delantero;Pocos goles respecto a la media de la liga;0.1
+529;Barcelona;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+530;Atletico Madrid;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+532;Valencia;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+532;Valencia;2024;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+533;Villarreal;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+534;Las Palmas;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+536;Sevilla;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+536;Sevilla;2024;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+537;Leganes;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+537;Leganes;2024;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+538;Celta Vigo;2024;Portero;Porteros con pocas paradas y muchos goles encajados;0.1
+540;Espanyol;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+540;Espanyol;2024;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+540;Espanyol;2024;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+541;Real Madrid;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+542;Alaves;2024;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+542;Alaves;2024;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+542;Alaves;2024;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+543;Real Betis;2024;Sin necesidad clara;Sin senales negativas relevantes;0.1
+546;Getafe;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+546;Getafe;2024;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+546;Getafe;2024;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+547;Girona;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+548;Real Sociedad;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+720;Valladolid;2024;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+727;Osasuna;2024;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+728;Rayo Vallecano;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2024;Delantero;Pocos goles respecto a la media de la liga;0.1
+798;Mallorca;2024;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+529;Barcelona;2025;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+530;Atletico Madrid;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+531;Athletic Club;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+531;Athletic Club;2025;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+532;Valencia;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+533;Villarreal;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+536;Sevilla;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+538;Celta Vigo;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+539;Levante;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+539;Levante;2025;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+540;Espanyol;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+541;Real Madrid;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+542;Alaves;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+543;Real Betis;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+546;Getafe;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+547;Girona;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+548;Real Sociedad;2025;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+548;Real Sociedad;2025;Laterales;Defensas con pocas asistencias y muchos regateados;0.1
+718;Oviedo;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+718;Oviedo;2025;Medio ofensivo;Mediocentros con pases clave y asistencias bajas;0.1
+718;Oviedo;2025;Pivote defensivo;Mediocentros con muchas faltas y baja recuperacion;0.1
+727;Osasuna;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+727;Osasuna;2025;Extremo;Delanteros con regate y asistencias por debajo de la media;0.1
+728;Rayo Vallecano;2025;Delantero;Pocos goles respecto a la media de la liga;0.1
+797;Elche;2025;Sin necesidad clara;Sin senales negativas relevantes;0.1
+798;Mallorca;2025;Delantero;Pocos goles respecto a la media de la liga;0.1

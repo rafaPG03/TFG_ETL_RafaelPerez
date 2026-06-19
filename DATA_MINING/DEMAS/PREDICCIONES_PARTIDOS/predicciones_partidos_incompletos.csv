@@ -1,0 +1,172 @@
+fecha,id_partido,id_local,nombre_local,id_visitante,nombre_visitante,prob_victoria_local,prob_empate,prob_victoria_visitante,prediccion
+2026-01-30,1391032,540,Espanyol,542,Alaves,65.58,17.87,16.55,Victoria local
+2026-01-31,1391031,797,Elche,529,Barcelona,18.64,33.67,47.69,Victoria visitante
+2026-01-31,1391034,539,Levante,530,Atletico Madrid,15.64,34.19,50.16,Victoria visitante
+2026-01-31,1391036,727,Osasuna,533,Villarreal,20.89,18.24,60.87,Victoria visitante
+2026-01-31,1391038,718,Oviedo,547,Girona,20.35,50.68,28.96,Empate
+2026-02-01,1391029,531,Athletic Club,548,Real Sociedad,34.64,28.14,37.22,Victoria visitante
+2026-02-01,1391030,543,Real Betis,532,Valencia,51.98,28.61,19.41,Victoria local
+2026-02-01,1391033,546,Getafe,538,Celta Vigo,18.71,26.74,54.55,Victoria visitante
+2026-02-01,1391037,541,Real Madrid,728,Rayo Vallecano,88.98,6.49,4.54,Victoria local
+2026-02-02,1391035,798,Mallorca,536,Sevilla,29.43,35.25,35.32,Victoria visitante
+2026-02-06,1391043,538,Celta Vigo,727,Osasuna,53.22,27.42,19.36,Victoria local
+2026-02-07,1391042,529,Barcelona,798,Mallorca,92.35,4.77,2.87,Victoria local
+2026-02-07,1391044,728,Rayo Vallecano,718,Oviedo,38.18,41.4,20.42,Empate
+2026-02-07,1391045,548,Real Sociedad,797,Elche,41.6,33.19,25.21,Victoria local
+2026-02-07,1391046,536,Sevilla,547,Girona,33.65,25.11,41.24,Victoria visitante
+2026-02-08,1391039,542,Alaves,546,Getafe,35.02,33.45,31.53,Victoria local
+2026-02-08,1391040,531,Athletic Club,539,Levante,42.4,20.59,37.01,Victoria local
+2026-02-08,1391041,530,Atletico Madrid,543,Real Betis,57.07,25.69,17.24,Victoria local
+2026-02-08,1391047,532,Valencia,541,Real Madrid,15.09,33.84,51.06,Victoria visitante
+2026-02-09,1391048,533,Villarreal,540,Espanyol,57.38,17.18,25.45,Victoria local
+2026-02-13,1391049,797,Elche,727,Osasuna,39.17,39.57,21.26,Empate
+2026-02-14,1391050,540,Espanyol,538,Celta Vigo,37.29,18.91,43.8,Victoria visitante
+2026-02-14,1391055,728,Rayo Vallecano,530,Atletico Madrid,18.08,49.6,32.32,Empate
+2026-02-14,1391056,541,Real Madrid,548,Real Sociedad,77.67,9.96,12.37,Victoria local
+2026-02-14,1391058,536,Sevilla,542,Alaves,46.38,18.97,34.65,Victoria local
+2026-02-15,1391051,546,Getafe,533,Villarreal,17.05,22.63,60.31,Victoria visitante
+2026-02-15,1391053,539,Levante,532,Valencia,28.82,40.55,30.63,Empate
+2026-02-15,1391054,798,Mallorca,543,Real Betis,18.6,56.9,24.5,Empate
+2026-02-15,1391057,718,Oviedo,531,Athletic Club,22.29,52.68,25.02,Empate
+2026-02-16,1391052,547,Girona,529,Barcelona,15.97,32.32,51.71,Victoria visitante
+2026-02-18,1390974,539,Levante,533,Villarreal,13.68,26.12,60.2,Victoria visitante
+2026-02-22,1391059,542,Alaves,547,Girona,40.33,27.84,31.84,Victoria local
+2026-02-22,1391060,531,Athletic Club,797,Elche,39.49,38.58,21.93,Victoria local
+2026-02-22,1391061,530,Atletico Madrid,540,Espanyol,72.31,12.45,15.24,Victoria local
+2026-02-22,1391062,529,Barcelona,539,Levante,91.78,4.93,3.3,Victoria local
+2026-02-22,1391063,543,Real Betis,728,Rayo Vallecano,59.63,21.09,19.28,Victoria local
+2026-02-22,1391064,538,Celta Vigo,798,Mallorca,58.55,24.52,16.93,Victoria local
+2026-02-22,1391065,546,Getafe,536,Sevilla,27.23,24.26,48.51,Victoria visitante
+2026-02-22,1391066,727,Osasuna,541,Real Madrid,17.28,20.06,62.67,Victoria visitante
+2026-02-22,1391067,548,Real Sociedad,718,Oviedo,57.9,19.85,22.25,Victoria local
+2026-02-22,1391068,533,Villarreal,532,Valencia,73.08,15.47,11.45,Victoria local
+2026-03-01,1391069,529,Barcelona,533,Villarreal,66.64,13.81,19.55,Victoria local
+2026-03-01,1391070,543,Real Betis,536,Sevilla,56.02,20.98,22.99,Victoria local
+2026-03-01,1391071,797,Elche,540,Espanyol,28.78,39.19,32.03,Empate
+2026-03-01,1391072,547,Girona,538,Celta Vigo,24.79,32.68,42.53,Victoria visitante
+2026-03-01,1391073,539,Levante,542,Alaves,36.55,33.78,29.67,Victoria local
+2026-03-01,1391074,798,Mallorca,548,Real Sociedad,28.2,44.34,27.45,Empate
+2026-03-01,1391075,728,Rayo Vallecano,531,Athletic Club,27.94,45.36,26.71,Empate
+2026-03-01,1391076,541,Real Madrid,546,Getafe,90.26,5.75,4.0,Victoria local
+2026-03-01,1391077,718,Oviedo,530,Atletico Madrid,15.36,47.17,37.46,Empate
+2026-03-01,1391078,532,Valencia,727,Osasuna,35.51,41.97,22.52,Empate
+2026-03-08,1391079,531,Athletic Club,529,Barcelona,24.62,14.28,61.1,Victoria visitante
+2026-03-08,1391080,530,Atletico Madrid,548,Real Sociedad,73.34,14.28,12.39,Victoria local
+2026-03-08,1391081,538,Celta Vigo,541,Real Madrid,19.06,28.07,52.87,Victoria visitante
+2026-03-08,1391082,540,Espanyol,718,Oviedo,65.1,21.08,13.82,Victoria local
+2026-03-08,1391083,546,Getafe,543,Real Betis,24.81,37.96,37.24,Empate
+2026-03-08,1391084,539,Levante,547,Girona,28.1,35.34,36.55,Victoria visitante
+2026-03-08,1391085,727,Osasuna,798,Mallorca,53.08,26.82,20.11,Victoria local
+2026-03-08,1391086,536,Sevilla,728,Rayo Vallecano,37.22,24.63,38.15,Victoria visitante
+2026-03-08,1391087,532,Valencia,542,Alaves,37.64,36.74,25.62,Victoria local
+2026-03-08,1391088,533,Villarreal,797,Elche,66.02,22.83,11.15,Victoria local
+2026-03-15,1391089,542,Alaves,533,Villarreal,20.85,20.8,58.34,Victoria visitante
+2026-03-15,1391090,530,Atletico Madrid,546,Getafe,89.22,6.27,4.51,Victoria local
+2026-03-15,1391091,529,Barcelona,536,Sevilla,88.56,6.08,5.36,Victoria local
+2026-03-15,1391092,543,Real Betis,538,Celta Vigo,42.82,17.04,40.14,Victoria local
+2026-03-15,1391093,547,Girona,531,Athletic Club,33.35,39.67,26.98,Empate
+2026-03-15,1391094,798,Mallorca,540,Espanyol,25.55,36.23,38.22,Victoria visitante
+2026-03-15,1391095,728,Rayo Vallecano,539,Levante,33.98,33.22,32.8,Victoria local
+2026-03-15,1391096,541,Real Madrid,797,Elche,74.85,16.89,8.26,Victoria local
+2026-03-15,1391097,548,Real Sociedad,727,Osasuna,52.05,21.98,25.97,Victoria local
+2026-03-15,1391098,718,Oviedo,532,Valencia,20.97,57.41,21.63,Empate
+2026-03-22,1391099,531,Athletic Club,543,Real Betis,29.77,36.12,34.1,Empate
+2026-03-22,1391100,529,Barcelona,728,Rayo Vallecano,88.55,6.77,4.69,Victoria local
+2026-03-22,1391101,538,Celta Vigo,542,Alaves,56.86,24.85,18.29,Victoria local
+2026-03-22,1391102,797,Elche,798,Mallorca,42.26,38.46,19.28,Victoria local
+2026-03-22,1391103,540,Espanyol,546,Getafe,55.24,21.52,23.24,Victoria local
+2026-03-22,1391104,539,Levante,718,Oviedo,42.02,34.91,23.07,Victoria local
+2026-03-22,1391105,727,Osasuna,547,Girona,40.72,25.82,33.46,Victoria local
+2026-03-22,1391106,541,Real Madrid,530,Atletico Madrid,70.28,12.69,17.03,Victoria local
+2026-03-22,1391107,536,Sevilla,532,Valencia,37.36,27.8,34.84,Victoria local
+2026-03-22,1391108,533,Villarreal,548,Real Sociedad,60.83,19.74,19.44,Victoria local
+2026-04-05,1391109,542,Alaves,727,Osasuna,44.21,32.58,23.22,Victoria local
+2026-04-05,1391110,530,Atletico Madrid,529,Barcelona,49.56,12.3,38.15,Victoria local
+2026-04-05,1391111,543,Real Betis,540,Espanyol,41.36,20.81,37.82,Victoria local
+2026-04-05,1391112,546,Getafe,531,Athletic Club,32.68,29.11,38.21,Victoria visitante
+2026-04-05,1391113,547,Girona,533,Villarreal,13.57,34.17,52.26,Victoria visitante
+2026-04-05,1391114,798,Mallorca,541,Real Madrid,11.67,32.91,55.42,Victoria visitante
+2026-04-05,1391115,728,Rayo Vallecano,797,Elche,26.3,52.43,21.27,Empate
+2026-04-05,1391116,548,Real Sociedad,539,Levante,50.66,17.52,31.82,Victoria local
+2026-04-05,1391117,718,Oviedo,536,Sevilla,18.7,45.37,35.93,Empate
+2026-04-05,1391118,532,Valencia,538,Celta Vigo,28.11,33.32,38.58,Victoria visitante
+2026-04-12,1391119,531,Athletic Club,533,Villarreal,23.75,18.04,58.21,Victoria visitante
+2026-04-12,1391120,529,Barcelona,540,Espanyol,77.11,11.06,11.82,Victoria local
+2026-04-12,1391121,538,Celta Vigo,718,Oviedo,56.62,26.27,17.11,Victoria local
+2026-04-12,1391122,797,Elche,532,Valencia,34.7,48.92,16.38,Empate
+2026-04-12,1391123,539,Levante,546,Getafe,27.21,33.41,39.37,Victoria visitante
+2026-04-12,1391124,798,Mallorca,728,Rayo Vallecano,34.79,34.97,30.24,Empate
+2026-04-12,1391125,727,Osasuna,543,Real Betis,24.63,40.61,34.76,Empate
+2026-04-12,1391126,541,Real Madrid,547,Girona,82.63,7.99,9.38,Victoria local
+2026-04-12,1391127,548,Real Sociedad,542,Alaves,55.3,20.07,24.63,Victoria local
+2026-04-12,1391128,536,Sevilla,530,Atletico Madrid,24.52,26.12,49.36,Victoria visitante
+2026-04-19,1391129,542,Alaves,798,Mallorca,46.46,34.42,19.12,Victoria local
+2026-04-19,1391130,530,Atletico Madrid,531,Athletic Club,88.59,6.04,5.38,Victoria local
+2026-04-19,1391131,543,Real Betis,541,Real Madrid,26.9,17.14,55.96,Victoria visitante
+2026-04-19,1391132,540,Espanyol,539,Levante,59.14,19.35,21.52,Victoria local
+2026-04-19,1391133,546,Getafe,529,Barcelona,18.36,18.33,63.31,Victoria visitante
+2026-04-19,1391134,727,Osasuna,536,Sevilla,39.3,30.6,30.09,Victoria local
+2026-04-19,1391135,728,Rayo Vallecano,548,Real Sociedad,23.91,51.47,24.62,Empate
+2026-04-19,1391136,718,Oviedo,797,Elche,26.0,54.2,19.8,Empate
+2026-04-19,1391137,532,Valencia,547,Girona,38.33,34.56,27.11,Victoria local
+2026-04-19,1391138,533,Villarreal,538,Celta Vigo,49.28,16.87,33.85,Victoria local
+2026-04-22,1391139,531,Athletic Club,727,Osasuna,44.8,30.24,24.96,Victoria local
+2026-04-22,1391140,529,Barcelona,538,Celta Vigo,67.75,12.26,19.99,Victoria local
+2026-04-22,1391141,797,Elche,530,Atletico Madrid,19.43,44.52,36.05,Empate
+2026-04-22,1391142,547,Girona,543,Real Betis,18.72,53.19,28.09,Empate
+2026-04-22,1391143,539,Levante,536,Sevilla,25.24,31.83,42.92,Victoria visitante
+2026-04-22,1391144,798,Mallorca,532,Valencia,32.89,41.71,25.4,Empate
+2026-04-22,1391145,728,Rayo Vallecano,540,Espanyol,23.16,44.47,32.36,Empate
+2026-04-22,1391146,541,Real Madrid,542,Alaves,91.86,5.08,3.06,Victoria local
+2026-04-22,1391147,548,Real Sociedad,546,Getafe,44.97,22.12,32.91,Victoria local
+2026-04-22,1391148,718,Oviedo,533,Villarreal,12.17,40.57,47.27,Victoria visitante
+2026-05-03,1391149,542,Alaves,531,Athletic Club,38.19,34.57,27.24,Victoria local
+2026-05-03,1391150,543,Real Betis,718,Oviedo,66.0,20.11,13.89,Victoria local
+2026-05-03,1391151,538,Celta Vigo,797,Elche,42.33,40.05,17.62,Victoria local
+2026-05-03,1391152,540,Espanyol,541,Real Madrid,19.14,18.96,61.9,Victoria visitante
+2026-05-03,1391153,546,Getafe,728,Rayo Vallecano,30.4,33.18,36.41,Victoria visitante
+2026-05-03,1391154,547,Girona,798,Mallorca,42.98,34.96,22.06,Victoria local
+2026-05-03,1391155,727,Osasuna,529,Barcelona,22.16,19.66,58.17,Victoria visitante
+2026-05-03,1391156,536,Sevilla,548,Real Sociedad,30.35,27.74,41.9,Victoria visitante
+2026-05-03,1391157,532,Valencia,530,Atletico Madrid,20.7,40.96,38.35,Empate
+2026-05-03,1391158,533,Villarreal,539,Levante,81.65,8.59,9.76,Victoria local
+2026-05-10,1391159,531,Athletic Club,532,Valencia,36.86,33.77,29.37,Victoria local
+2026-05-10,1391160,530,Atletico Madrid,538,Celta Vigo,63.0,13.98,23.02,Victoria local
+2026-05-10,1391161,529,Barcelona,541,Real Madrid,55.87,14.73,29.4,Victoria local
+2026-05-10,1391162,797,Elche,542,Alaves,42.87,35.49,21.64,Victoria local
+2026-05-10,1391163,539,Levante,727,Osasuna,33.91,38.55,27.54,Empate
+2026-05-10,1391164,798,Mallorca,533,Villarreal,15.02,29.99,54.99,Victoria visitante
+2026-05-10,1391165,728,Rayo Vallecano,547,Girona,31.55,40.88,27.58,Empate
+2026-05-10,1391166,548,Real Sociedad,543,Real Betis,23.79,40.56,35.65,Empate
+2026-05-10,1391167,718,Oviedo,546,Getafe,21.29,48.33,30.38,Empate
+2026-05-10,1391168,536,Sevilla,540,Espanyol,24.0,22.4,53.6,Victoria visitante
+2026-05-13,1391169,542,Alaves,529,Barcelona,19.47,17.17,63.36,Victoria visitante
+2026-05-13,1391170,543,Real Betis,797,Elche,47.69,35.45,16.86,Victoria local
+2026-05-13,1391171,538,Celta Vigo,539,Levante,53.7,21.39,24.9,Victoria local
+2026-05-13,1391172,540,Espanyol,531,Athletic Club,53.92,23.64,22.44,Victoria local
+2026-05-13,1391173,546,Getafe,798,Mallorca,40.01,33.4,26.6,Victoria local
+2026-05-13,1391174,547,Girona,548,Real Sociedad,28.71,39.93,31.36,Empate
+2026-05-13,1391175,727,Osasuna,530,Atletico Madrid,23.35,29.58,47.07,Victoria visitante
+2026-05-13,1391176,541,Real Madrid,718,Oviedo,89.62,6.2,4.17,Victoria local
+2026-05-13,1391177,532,Valencia,728,Rayo Vallecano,37.02,39.04,23.93,Empate
+2026-05-13,1391178,533,Villarreal,536,Sevilla,76.08,12.01,11.92,Victoria local
+2026-05-17,1391179,531,Athletic Club,538,Celta Vigo,26.06,21.33,52.61,Victoria visitante
+2026-05-17,1391180,530,Atletico Madrid,547,Girona,80.04,10.93,9.03,Victoria local
+2026-05-17,1391181,529,Barcelona,543,Real Betis,68.43,18.01,13.56,Victoria local
+2026-05-17,1391182,797,Elche,546,Getafe,38.64,38.28,23.08,Victoria local
+2026-05-17,1391183,539,Levante,798,Mallorca,36.05,37.82,26.13,Empate
+2026-05-17,1391184,727,Osasuna,540,Espanyol,30.1,25.23,44.67,Victoria visitante
+2026-05-17,1391185,728,Rayo Vallecano,533,Villarreal,15.42,43.67,40.91,Empate
+2026-05-17,1391186,548,Real Sociedad,532,Valencia,43.39,29.29,27.32,Victoria local
+2026-05-17,1391187,718,Oviedo,542,Alaves,24.11,52.7,23.2,Empate
+2026-05-17,1391188,536,Sevilla,541,Real Madrid,19.44,16.86,63.69,Victoria visitante
+2026-05-24,1391189,542,Alaves,728,Rayo Vallecano,35.91,35.83,28.26,Victoria local
+2026-05-24,1391190,543,Real Betis,539,Levante,59.16,18.0,22.84,Victoria local
+2026-05-24,1391191,538,Celta Vigo,536,Sevilla,44.02,30.6,25.38,Victoria local
+2026-05-24,1391192,540,Espanyol,548,Real Sociedad,44.21,25.46,30.33,Victoria local
+2026-05-24,1391193,546,Getafe,727,Osasuna,33.96,33.86,32.18,Victoria local
+2026-05-24,1391194,547,Girona,797,Elche,35.88,42.91,21.22,Empate
+2026-05-24,1391195,798,Mallorca,718,Oviedo,42.78,34.27,22.95,Victoria local
+2026-05-24,1391196,541,Real Madrid,531,Athletic Club,89.7,5.26,5.03,Victoria local
+2026-05-24,1391197,532,Valencia,529,Barcelona,19.65,28.92,51.42,Victoria visitante
+2026-05-24,1391198,533,Villarreal,530,Atletico Madrid,43.93,23.47,32.59,Victoria local
