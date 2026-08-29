@@ -1,0 +1,699 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+Este capítulo trata sobre todos los aspectos relacionados con la implementación del sistema en código, haciendo uso de un determinado entorno tecnológico.
+
+
+
+\section{Arquitectura BI}
+Para la construcción de la arquitectura BI, hemos seguido un proceso ETL (\textit{Extract, Transform, Load}) que abarca desde la extracción de los datos en crudo mediante Api-Football hasta la carga en la base de datos PostgreSQL. Así que estructuraremos la explicación en tres fases: Extracción, Transformación y Carga, explicando la organización de directorios, archivos creados y conexiones entre las diferentes fases.
+\subsection{Extracción}
+
+En esta primera etapa se ha realizado la recopilación de datos de los últimos 10 años de la Liga Española de Fútbol procedente de una API externa especializada en fútbol, llamada API-Football, la cual contaba con una buena cantidad de datos sobre partidos, temporadas y rendimiento de equipos y jugadores. Para esta recopilación se han desarrollado varios \textit{scripts} en Python ubicados en el directorio DATOS, encargados de hacer las diferentes peticiones a la API correspondientes a los datos que necesitaban y, a su vez, almacenar los datos en formato JSON separados por temporada.
+
+No se ha realizado transformación directa en estos \textit{scripts}, ya que se ha decidido que guardar los datos brutos era una buena práctica para consultar los datos en busca de posibles inconsistencias, fallos o falta de algún dato. Además de poder repetir el proceso ETL sin necesidad de consultar cada vez a la API.
+
+Los datos que se han extraído en esta etapa han sido los siguientes:
+
+\renewcommand{\arraystretch}{1.2}
+
+\begin{longtable}{|p{3.5cm}|p{4.9cm}|p{7cm}|}
+\caption{Tipos de datos extraídos durante el proceso ETL.}
+\label{tab:tipos_datos_etl} \\
+
+\hline
+\textbf{Tipo de dato} & \textbf{Directorio de salida} & \textbf{Descripción} \\ 
+\hline
+\endfirsthead
+
+\hline
+\textbf{Tipo de dato} & \textbf{Directorio de salida} & \textbf{Descripción} \\ 
+\hline
+\endhead
+
+\hline
+\multicolumn{3}{r}{\textit{Continúa en la siguiente página}} \\
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Equipos &
+\texttt{DATOS\slash equipos\_base\slash} &
+Información básica de los equipos participantes. \\ \hline
+
+Partidos &
+\texttt{DATOS\slash partidos\_base\slash} &
+Calendario, jornadas, fechas, equipos locales, visitantes y resultados. \\ \hline
+
+Estadísticas de partidos &
+\texttt{DATOS\slash partidos\_stats\slash} &
+Estadísticas agregadas de los equipos en cada partido. \\ \hline
+
+Eventos de partidos &
+\texttt{DATOS\slash partidos\_eventos\slash} &
+Goles, tarjetas, sustituciones y otros eventos ocurridos durante los encuentros. \\ \hline
+
+Jugadores por partido &
+\texttt{DATOS\slash jugadores\_partido\slash} &
+Rendimiento individual de cada jugador en cada partido. \\ \hline
+
+Jugadores por temporada &
+\texttt{DATOS\slash jugadores\_temporada\slash} &
+Perfiles y estadísticas acumuladas de los jugadores por temporada. \\ \hline
+
+Estadísticas de equipos por temporada &
+\texttt{DATOS\slash equipo\_stats\_temporada\slash} &
+Datos agregados del rendimiento de cada equipo durante una temporada. \\ \hline
+
+\end{longtable}
+
+Para esta extracción se han desarrollado los siguientes \textit{scripts}, los cuales explicaremos su funcionamiento:
+
+\begin{longtable}{|p{5cm}|p{9cm}|}
+\caption{Scripts desarrollados para la extracción de datos.}
+\label{tab:scripts_extraccion} \\
+
+\hline
+\textbf{Script} & \textbf{Función} \\ \hline
+\endfirsthead
+
+\hline
+\textbf{Script} & \textbf{Función} \\ \hline
+\endhead
+
+\hline
+\multicolumn{2}{r}{\textit{Continúa en la siguiente página}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\path{extraer_equipos.py} &
+Consulta la API para obtener la información de los equipos participantes en LaLiga para cada temporada. \\ \hline
+
+\path{extraer_partidos.py} &
+Extrae el calendario completo de partidos correspondiente a cada temporada. \\ \hline
+
+\path{extraer_stats_partidos.py} &
+Obtiene las estadísticas agregadas de cada equipo en los distintos partidos disputados. \\ \hline
+
+\path{extraer_eventos_partidos.py} &
+Recupera los eventos ocurridos durante los partidos, como goles, tarjetas, sustituciones y otras incidencias. \\ \hline
+
+\path{extraer_jugadores_partido.py} &
+Extrae las estadísticas individuales de cada jugador para todos los partidos disputados. \\ \hline
+
+\path{extraer_jugadores_temporadas.py} &
+Obtiene las estadísticas acumuladas y el rendimiento de los jugadores en cada temporada. \\ \hline
+
+\path{extraer_equipos_temporada.py} &
+Extrae las estadísticas agregadas de cada equipo al finalizar cada jornada de la temporada. \\ \hline
+
+\path{extraer_jugadores_faltantes.py} &
+Recupera la información de aquellos jugadores que no fueron obtenidos durante la extracción inicial. \\ \hline
+
+\end{longtable}
+
+
+
+Aunque existen distintos ficheros para extraer equipos, partidos, clasificaciones, estad\'isticas, eventos o jugadores, todos siguen una misma l\'ogica general. Cada script se encarga de consultar uno o varios \textit{endpoints} de la API, parametrizando la petici\'on seg\'un la temporada, el identificador del partido, el equipo o el jugador.
+
+La t\'ecnica empleada se basa en peticiones HTTP mediante la librer\'ia \texttt{requests}. Para cada consulta se construye din\'amicamente la URL del \textit{endpoint}, se incorporan las cabeceras de autenticaci\'on requeridas por la API y se env\'ia la petici\'on. La respuesta recibida se transforma a formato JSON y se almacena en disco, manteniendo una copia de los datos originales antes de aplicar cualquier transformaci\'on.
+
+Un esquema general del proceso seguido por los scripts de extracci\'on es el siguiente:
+
+\begin{enumerate}
+    \item Definir las temporadas o identificadores que se desean extraer.
+    \item Construir el \textit{endpoint} correspondiente de la API.
+    \item Enviar la petici\'on HTTP con las cabeceras de autenticaci\'on.
+    \item Recibir la respuesta en formato JSON.
+    \item Validar si la respuesta contiene datos.
+    \item Guardar el JSON en la carpeta correspondiente.
+\end{enumerate}
+
+Esta organizaci\'on permite separar claramente la extracci\'on de la transformaci\'on. Los datos brutos se conservan en el directorio \texttt{DATOS/}, agrupados seg\'un el tipo de informaci\'on y la temporada correspondiente. Por ejemplo, las clasificaciones se almacenan en \texttt{DATOS/clasificaciones/}, los partidos en \texttt{DATOS/partidos\_base/}, las estad\'isticas en \texttt{DATOS/partidos\_stats/} y los eventos en \texttt{DATOS/partidos\_eventos/}.
+
+Adem\'as, los ficheros se organizan por temporada, lo que permite trabajar de forma incremental. Si se desea incorporar una nueva temporada, basta con ejecutar los scripts de extracci\'on para ese a\~no concreto y almacenar los nuevos JSON en la carpeta correspondiente. Esta estructura facilita la actualizaci\'on del sistema y permite mantener un hist\'orico completo de las temporadas analizadas.
+
+\subsection{Transformación}
+
+La fase de transformación se ha desarrollado principalmente en el directorio \path{ETL/}. Su objetivo es convertir los datos brutos extraídos desde la API, almacenados inicialmente en formato JSON dentro de \path{DATOS/}, en un conjunto de tablas estructuradas y preparadas para su posterior carga en base de datos.
+
+En esta etapa se produce el cambio más importante del proceso ETL: los datos dejan de tener una estructura anidada propia de la API, en formato JSON, y pasan a organizarse en un esquema basado en dimensiones y hechos. Para ello, los scripts Python leen los JSON descargados, recorren sus estructuras internas, seleccionan los campos relevantes, normalizan nombres, convierten tipos de datos, gestionan valores nulos y finalmente generan ficheros CSV dentro del directorio \path{ETL/DSA/}. El resultado de esta fase es una capa analítica intermedia formada por tablas limpias, homogéneas y listas para cargarse en PostgreSQL.
+
+Cada script ha recibido un tratamiento distinto en función de los datos del JSON que debía transformar, aunque todos ellos siguen una serie de pasos comunes con el objetivo de mantener una estructura uniforme en el proceso. Estos pasos son los siguientes:
+
+\begin{enumerate}
+    \item Lectura de los ficheros JSON generados en la fase de extracción.
+    \item Recorrido de estructuras anidadas de la API.
+    \item Selección de campos relevantes para el modelo BI.
+    \item Conversión de los datos a un \texttt{DataFrame} de pandas.
+    \item Limpieza de valores nulos o inconsistentes.
+    \item Conversión de tipos de datos numéricos, fechas e identificadores.
+    \item Generación de claves de relación entre tablas.
+    \item Exportación final a CSV con separador \texttt{;}.
+\end{enumerate}
+
+Una vez explicado el procedimiento general, se describen las transformaciones realizadas sobre los distintos JSON para construir las tablas que conforman el esquema de la base de datos.
+
+Primero se describen las tablas de dimensiones, las cuales contienen información descriptiva de las entidades principales del sistema, como equipos, jugadores, partidos y tiempo.
+
+La tabla \texttt{dim\_equipos.csv} se genera a partir de los datos básicos de equipos. Esta transformación es sencilla, ya que principalmente se extraen atributos descriptivos del JSON, como el identificador del equipo, nombre, código, país, estadio, ciudad o capacidad. El cambio principal consiste en pasar de una estructura anidada a una fila tabular por equipo.
+
+La tabla \texttt{dim\_jugadores.csv} sigue una lógica similar. Se extraen datos personales y físicos del jugador, como nombre, edad, fecha de nacimiento, nacionalidad, altura, peso y fotografía. En este caso, la transformación también permite unificar la información de jugadores que pueden aparecer en distintas temporadas.
+
+La tabla \texttt{dim\_partidos.csv} requiere una transformación más relevante, ya que se separa la información del partido, los equipos participantes y el resultado. Además, se distingue entre partidos completados e incompletos, evitando perder partidos futuros o sin resultado definitivo. Durante esta transformación, la jornada, que llega desde la API como texto, se convierte en un valor numérico. También se convierten los goles a valores enteros y se normaliza el formato de fecha para que pueda ser utilizado correctamente en la base de datos.
+
+La tabla \texttt{dim\_tiempo.csv} se genera a partir de las fechas de los partidos. En este caso se crea una dimensión temporal que permite analizar la información por año, mes, día y jornada. Esta tabla facilita la realización de consultas temporales y permite agrupar los datos deportivos según diferentes niveles de detalle.
+
+\subsubsection{Transformaciones sobre tablas de hechos}
+
+Las tablas de hechos almacenan medidas deportivas asociadas a partidos, jugadores, equipos o jornadas.
+
+La tabla \texttt{h\_jugador\_partido.csv} es una de las transformaciones más importantes. La API devuelve las estadísticas de jugadores dentro de estructuras anidadas por partido, equipo, jugador y bloque estadístico. El script transforma esta información en una fila por jugador y partido, recogiendo datos como el identificador del partido, el jugador, el equipo, la posición, los minutos disputados, la nota, los goles, las asistencias, los pases y los duelos.
+
+Además, se normalizan posiciones y se convierten las estadísticas a valores numéricos. Los valores ausentes se sustituyen por cero cuando representan acciones que no se han producido durante el partido, como goles, asistencias, disparos o duelos ganados. De esta forma se garantiza que los datos puedan ser utilizados posteriormente en cálculos estadísticos y modelos de minería de datos.
+
+La tabla \texttt{h\_jugador\_temporada.csv} recoge estadísticas acumuladas del jugador durante una temporada. En esta transformación se traducen las posiciones originales de la API al vocabulario usado en el sistema, permitiendo trabajar con categorías más comprensibles para el usuario, como portero, defensa, mediocentro o delantero. También se convierten las métricas acumuladas a tipos numéricos para facilitar su explotación analítica.
+
+La tabla \texttt{h\_equipo\_partido.csv} transforma las estadísticas de equipo por partido. En este caso, una transformación importante es el mapeo de nombres originales de la API a nombres de columnas más claros y homogéneos. Por ejemplo, estadísticas como tiros a puerta, posesión, pases totales, porcentaje de pases acertados o goles esperados se adaptan al formato utilizado en la base de datos. También se eliminan caracteres no numéricos, como el símbolo de porcentaje, y se convierten las columnas a enteros o decimales según corresponda.
+
+La tabla \texttt{h\_equipo\_temporada.csv} se genera a partir de las clasificaciones. Su transformación consiste en separar la información general del equipo, sus puntos, posición, diferencia de goles, forma reciente y estadísticas como local y visitante. Es una transformación principalmente de aplanado de JSON a tabla, en la que se pasa de una estructura jerárquica a un formato tabular preparado para consultas analíticas.
+
+La tabla \texttt{h\_equipo\_jornada.csv} es una de las transformaciones más elaboradas, ya que reconstruye la clasificación jornada a jornada a partir de los partidos completados. Para ello se acumulan puntos, victorias, empates, derrotas, goles a favor y goles en contra tras cada jornada. Posteriormente, los equipos se ordenan por puntos, diferencia de goles y goles a favor para obtener la clasificación correspondiente a cada jornada.
+
+La tabla \texttt{h\_partidos\_eventos.csv} transforma los eventos del partido, como goles, tarjetas, sustituciones o acciones revisadas por VAR. La principal transformación consiste en traducir eventos y detalles al castellano, normalizar los minutos e identificar el jugador, el equipo y, cuando corresponde, el asistente o jugador sustituido. De esta forma, los eventos quedan almacenados de manera homogénea y pueden consultarse posteriormente desde la aplicación.
+
+Como resultado, la carpeta \path{.../ETL/DSA/} almacena los CSV resultantes de todas las transformaciones, con la información que posteriormente se cargará en la base de datos.
+
+\subsection{Carga}
+
+La última fase del proceso ETL corresponde a la carga de los datos transformados en la base de datos. Una vez generados los ficheros CSV en el directorio \texttt{ETL/DSA/}, estos se importan en PostgreSQL mediante la instrucción \texttt{COPY FROM}, ejecutada desde la terminal.
+
+La elección de \texttt{COPY FROM} se debe a que permite realizar cargas masivas de datos de forma más eficiente que una inserción fila a fila mediante sentencias \texttt{INSERT}. Como el proceso de transformación ya ha generado ficheros tabulares limpios, con columnas definidas y separador constante, la carga mediante \texttt{COPY} resulta adecuada para importar rápidamente las tablas de dimensiones y hechos.
+
+El flujo general de carga es el siguiente:
+
+\begin{enumerate}
+    \item Generar los ficheros CSV mediante los scripts del directorio \texttt{ETL/}.
+    \item Comprobar que las columnas del CSV coinciden con la estructura de la tabla destino.
+    \item Ejecutar la instrucción \texttt{COPY FROM} desde la terminal o desde la consola de PostgreSQL.
+    \item Cargar primero las tablas de dimensiones.
+    \item Cargar después las tablas de hechos, que dependen de las dimensiones.
+    \item Verificar que los registros se han insertado correctamente.
+\end{enumerate}
+
+El uso de \texttt{COPY FROM} permite mantener una separación clara entre la fase de transformación y la fase de persistencia. Los scripts Python se encargan de limpiar y estructurar los datos, mientras que PostgreSQL se encarga de importar los CSV ya preparados.
+
+El orden de carga es importante debido a las relaciones lógicas entre las tablas. En primer lugar, se cargan las dimensiones, ya que contienen las entidades principales del modelo. Posteriormente, se cargan las tablas de hechos, que hacen referencia a dichas entidades mediante identificadores.
+
+\begin{enumerate}
+    \item \texttt{dim\_equipos}
+    \item \texttt{dim\_jugadores}
+    \item \texttt{dim\_partidos}
+    \item \texttt{dim\_tiempo}
+    \item \texttt{h\_equipo\_partido}
+    \item \texttt{h\_equipo\_temporada}
+    \item \texttt{h\_equipo\_jornada}
+    \item \texttt{h\_jugador\_partido}
+    \item \texttt{h\_jugador\_temporada}
+    \item \texttt{h\_partidos\_eventos}
+\end{enumerate}
+
+\section{Aplicación móvil}
+
+El código fuente del sistema se ha estructurado siguiendo una arquitectura modular, separando claramente las responsabilidades entre la capa cliente (\textit{frontend}) y la capa servidor (\textit{backend}). Esta organización facilita el mantenimiento, la escalabilidad y la evolución futura del proyecto.
+
+A nivel general, el repositorio principal se compone de dos bloques funcionales diferenciados:
+
+\begin{itemize}
+    \item {\textit{Frontend}:} Aplicación móvil desarrollada con React Native y Expo.
+    \item {\textit{Backend}:} API REST desarrollada con Node.js y Express encargada de la lógica de negocio y acceso a datos.
+\end{itemize}
+
+\subsection{\textit{Frontend}}
+
+El \textit{frontend} de la aplicación se ha desarrollado con React Native y Expo, permitiendo construir una aplicación móvil multiplataforma a partir de una única base de código. Esta capa es la encargada de presentar la información al usuario, gestionar la navegación entre pantallas y consumir los datos proporcionados por la API REST del \textit{backend}.
+
+\subsubsection{Organización del \textit{frontend}}
+
+La estructura del \textit{frontend} se ha organizado de forma modular, separando las pantallas completas, los componentes reutilizables, los recursos gráficos, la configuración visual y los contextos globales de la aplicación.
+
+\begin{lstlisting}[caption={Estructura del frontend.}]
+frontend/
+|
+|-- App.js
+`-- src/
+    |
+    |-- assets/
+    |-- components/
+    |-- context/
+    |-- screens/
+    `-- theme/
+\end{lstlisting}
+
+El archivo \texttt{App.js} actúa como punto de entrada de la aplicación móvil. Desde él se inicializa la navegación principal, se comprueba el estado de la sesión del usuario y se cargan los proveedores globales necesarios, como el contexto de favoritos o la configuración visual de la aplicación.
+
+La carpeta \texttt{screens/} contiene las pantallas principales de la aplicación, como inicio de sesión, registro, inicio, temporadas, equipos, jugadores, partidos, perfil y ajustes. Por su parte, la carpeta \texttt{components/} agrupa elementos reutilizables que aparecen en distintas vistas, especialmente en las pantallas de detalle y en los dashboards. La carpeta \texttt{context/} se utiliza para gestionar información compartida entre pantallas, como los favoritos del usuario, mientras que \texttt{theme/} contiene la configuración asociada a la apariencia visual y al modo oscuro.
+
+\subsubsection{Navegación y pantallas principales}
+
+La navegación de la aplicación se ha implementado mediante React Navigation. Se utiliza una navegación principal que separa las pantallas de autenticación de la aplicación interna y un menú lateral que permite acceder a las secciones principales una vez iniciada la sesión.
+
+Las pantallas de autenticación permiten registrar nuevos usuarios e iniciar sesión. Una vez autenticado, el usuario accede a la aplicación principal, donde puede consultar partidos, temporadas, equipos y jugadores. Además, dispone de pantallas de perfil, ajustes, favoritos, simulación manual de temporada, pantalla de \textit{data mining} y acceso al asistente conversacional Agente de Oro.
+
+Las pantallas de detalle permiten profundizar en la información de una entidad concreta. Por ejemplo, desde un listado de equipos se puede acceder al detalle de un club, desde el listado de jugadores a la ficha individual de un futbolista, y desde el calendario de partidos al análisis específico de un encuentro. Para evitar concentrar demasiada información en una única vista, estas pantallas se organizan mediante pestañas superiores.
+
+\begin{table}[H]
+\centering
+\caption{Pantallas principales del frontend.}
+\label{tab:pantallas_frontend}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{5cm}|p{10cm}|}
+\hline
+\textbf{Pantalla} & \textbf{Función principal} \\ \hline
+
+Inicio &
+Muestra los partidos de la jornada y permite acceder rápidamente a información relevante de la competición. \\ \hline
+
+Temporadas &
+Permite consultar clasificaciones, rankings, partidos y análisis globales de una temporada. \\ \hline
+
+Equipos &
+Presenta el listado de clubes y permite acceder al detalle de cada equipo. \\ \hline
+
+Jugadores &
+Muestra el listado de futbolistas disponibles y permite consultar su información individual. \\ \hline
+
+Partidos &
+Permite consultar encuentros por temporada y jornada, así como acceder al detalle de cada partido. \\ \hline
+
+Análisis IA &
+Centraliza los resultados generados por los modelos analíticos, como predicciones, simulaciones, estados de forma, jugadores similares y recomendaciones. \\ \hline
+
+Simulación &
+Permite modificar manualmente resultados pendientes y recalcular escenarios alternativos de clasificación. \\ \hline
+
+Agente de Oro &
+Permite realizar consultas en lenguaje natural sobre la información almacenada en la base de datos. \\ \hline
+
+Perfil y Ajustes &
+Permiten consultar los datos del usuario, cerrar sesión y modificar preferencias visuales como el modo oscuro. \\ \hline
+
+\end{tabular}
+\end{table}
+
+\subsubsection{Dashboards y visualización de datos}
+
+Uno de los elementos principales del \textit{frontend} es la representación visual de información deportiva mediante \textit{dashboards}. Estas vistas permiten transformar los datos almacenados en la base de datos en gráficos, indicadores y comparativas comprensibles para el usuario.
+
+La aplicación incorpora \textit{dashboards} asociados a temporadas, equipos, jugadores y partidos. Cada uno de ellos se orienta a un nivel de análisis diferente: la temporada permite estudiar la evolución general de la competición, el equipo muestra su rendimiento colectivo, el jugador resume su aportación individual y el partido compara el comportamiento de los equipos y futbolistas en un encuentro concreto.
+
+Para la representación gráfica se utilizan componentes visuales adaptados al entorno móvil, combinando tarjetas, rankings, gráficos de líneas, barras y radares. El objetivo es mostrar información compleja de forma clara, evitando que el usuario tenga que interpretar directamente tablas extensas o resultados sin procesar.
+
+\begin{figure}[H]
+\centering
+  \begin{subfigure}[b]{0.4\textwidth} % 0.4 es el tamaño de la imagen
+    \includegraphics[width=0.85\textwidth]{figures/dash_tempo1.jpeg} % 0.9 es el tamaño dentro del espacio anterior
+    \label{fig:DT1} % Etiqueta de la imagen
+  \end{subfigure}
+  %
+  \begin{subfigure}[b]{0.4\textwidth} %Para incluir una segunda figura
+    \includegraphics[width=0.9\textwidth]{figures/dash_tempo2.jpeg}
+    \label{fig:DT2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth} % 0.4 es el tamaño de la imagen
+    \includegraphics[width=0.9\textwidth]{figures/dash_tempo3.jpeg} % 0.9 es el tamaño dentro del espacio anterior
+    \label{fig:DT3} % Etiqueta de la imagen
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth} % 0.4 es el tamaño de la imagen
+    \includegraphics[width=0.9\textwidth]{figures/dash_tempo4.jpeg} % 0.9 es el tamaño dentro del espacio anterior
+    \label{fig:DT4} % Etiqueta de la imagen
+  \end{subfigure}
+  \caption{Dashboard de Temporada.}
+  \label{fig:dashboard}
+\end{figure}
+
+
+\subsubsection{Integración con el \textit{backend}}
+
+El \textit{frontend} se comunica con el \textit{backend} mediante peticiones HTTP a la API REST desarrollada en Node.js y Express. Las pantallas solicitan únicamente los datos necesarios en cada caso y reciben la información en formato JSON, que posteriormente se muestra mediante listados, tarjetas, gráficos o tablas.
+
+Esta integración permite separar claramente la capa visual de la lógica de acceso a datos. El \textit{frontend} se centra en la experiencia de usuario y la presentación de resultados, mientras que el \textit{backend} se encarga de consultar PostgreSQL, aplicar la lógica correspondiente y devolver respuestas estructuradas.
+
+Además, la aplicación gestiona situaciones habituales como la carga de datos, la ausencia de información o posibles errores de conexión, mostrando mensajes adecuados para mantener una experiencia de uso coherente.
+
+\subsubsection{Funcionalidades implementadas}
+
+Además de las pantallas generales de consulta, el \textit{frontend} incorpora varias funcionalidades específicas relacionadas directamente con los objetivos del proyecto.
+
+En primer lugar, se incluye una pantalla de \textit{data mining}, cuyo objetivo es dar mayor protagonismo a los resultados generados por los modelos analíticos. Desde esta pantalla se consultan predicciones de partidos, simulaciones de temporada, estados de forma de equipos y jugadores, jugadores similares, probables goleadores y recomendaciones de fichajes.
+
+También se ha desarrollado una pantalla de simulación manual de temporada. Esta funcionalidad permite modificar resultados de partidos pendientes y recalcular una clasificación alternativa y las probabilidades de cada equipo, sin alterar los datos reales almacenados en la base de datos. De esta forma, el usuario puede explorar distintos escenarios y analizar cómo determinados resultados afectarían a la competición.
+
+Por último, la aplicación incorpora el asistente IA, Agente de Oro, integrado en la interfaz como punto de acceso a consultas en lenguaje natural. Esta funcionalidad permite al usuario preguntar por estadísticas, equipos, jugadores o partidos sin necesidad de navegar manualmente por todas las pantallas de la aplicación.
+\subsection{\textit{Backend}}
+% En este apartado explicaremos las diferentes partes que hemos implementado en el backend para que la app y la base de datos pueden comunicarse de forma eficiente y escalable. 
+
+% \subsection{Arranque del servidor}
+
+% El punto de entrada del backend se encuentra en el archivo app.js. Este archivo es el encargado de inicializar el servidor Express, cargar las variables de entorno, configurar los middlewares principales y montar las rutas de la API.
+
+% En primer lugar, se carga la configuración definida en el archivo .env mediante la librería dotenv. Esto permite utilizar variables de entorno como el puerto del servidor o los datos de conexión necesarios para otros módulos del backend. A continuación, se crea una instancia de Express y se configuran los middlewares globales.
+
+% Uno de los middlewares utilizados es cors, que permite que el frontend pueda
+% realizar peticiones al backend aunque ambos se ejecuten en orígenes distintos.
+% También se utiliza express.json(), necesario para que el servidor pueda recibir y procesar cuerpos de petición en formato JSON, por ejemplo durante el inicio de sesión, el registro de usuarios o las consultas al chatbot.
+
+% Todas las rutas de la API se agrupan bajo el prefijo /api. Esto permite mantener una estructura clara y diferenciar las peticiones dirigidas al backend del resto de recursos de la aplicación.
+
+% \begin{lstlisting}[caption={app.js}]
+% require('dotenv').config();
+
+% const express = require('express');
+% const cors = require('cors');
+
+% const routes = require('./routes');
+% const app = express();
+
+% app.use(cors());
+% app.use(express.json());
+
+% app.use('/api', routes);
+
+% const PORT = process.env.PORT || 3000;
+% app.listen(PORT, () => {
+%   console.log(`Servidor corriendo en el puerto ${PORT}`);
+% });
+% \end{lstlisting}
+
+% En este fragmento se observa que el servidor utiliza el puerto indicado en la
+% variable de entorno PORT. En caso de que no exista dicha variable, se utiliza
+% por defecto el puerto 3000. Finalmente, mediante app.listen(), el servidor queda a la espera de recibir peticiones HTTP.
+
+% Por tanto, app.js centraliza el arranque del backend: carga la configuracion,
+% prepara Express, habilita la comunicacion con el frontend, registra las rutas
+% bajo el prefijo /api y deja el servidor escuchando peticiones.
+
+% \subsection{Conexión con Base de Datos}
+
+% La conexion del backend con la base de datos se centraliza en el archivo
+% config/db.js. Para ello se utiliza la libreria pg, que permite conectar una
+% aplicación Node.js con una base de datos PostgreSQL.
+
+% En este archivo se crea un objeto Pool. Un pool de conexiones permite reutilizar conexiones a la base de datos en lugar de abrir una nueva conexión en cada petición. Esto mejora el rendimiento del servidor y permite gestionar de forma mas eficiente múltiples consultas simultaneas realizadas desde el frontend.
+
+% \begin{lstlisting}[caption = Configuración de la base de datos]
+% const { Pool } = require('pg');
+
+% console.log("Conectando a DB con usuario:", process.env.DB_USER);
+
+% const pool = new Pool({
+%   user: String(process.env.DB_USER || ''),
+%   host: String(process.env.DB_HOST || ''),
+%   database: String(process.env.DB_NAME || ''),
+%   password: String(process.env.DB_PASSWORD || ''),
+%   port: process.env.DB_PORT,
+% });
+
+% module.exports = pool;
+% \end{lstlisting}
+
+% Como vemos, recibimos la configuración de la base de datos Postgres desde las variables de entorno para realizar la conexión. Una vez creado el pool, este se exporta mediante module.exports para poder ser utilizado desde los controladores y servicios del backend.
+
+% \subsection{Rutas y controladores}
+
+% Una parte fundamental de la implementación del backend es la separación entre
+% rutas y controladores. Las rutas definen los endpoints disponibles de la API,
+% mientras que los controladores contienen la lógica que se ejecuta cuando el
+% frontend realiza una petición.
+
+% Esta separación permite que el código sea mas claro y mantenible. Por un lado,
+% los archivos de routes indican que URL existe y que método HTTP utiliza. Por
+% otro lado, los archivos de controllers se encargan de consultar la base de datos, procesar los parámetros recibidos y devolver una respuesta JSON.
+
+% El archivo routes/index.js actua como punto central de las rutas del backend.
+% Cada grupo de endpoints se monta bajo un prefijo concreto. Como el archivo app.js monta todas las rutas bajo /api, una ruta definida como /equipos pasa a estar disponible finalmente como /api/equipos.
+
+% \begin{lstlisting}[caption=routes/index.js]
+% const express = require('express');
+% const router = express.Router();
+
+% const equiposRoutes = require('./equipos');
+% const partidosRoutes = require('./partidos');
+% const UsuariosRoutes = require('./usuarios');
+% const jugadoresRoutes = require('./jugadores');
+% const temporadasRoutes = require('./temporadas');
+% const busquedaRoutes = require('./buscador');
+% const favoritosRoutes = require('./favoritos');
+% const chatRoutes = require('./chatbot');
+
+% router.use('/equipos', equiposRoutes);
+% router.use('/partidos', partidosRoutes);
+% router.use('/usuarios', UsuariosRoutes);
+% router.use('/temporadas', temporadasRoutes);
+% router.use('/jugadores', jugadoresRoutes);
+% router.use('/buscador', busquedaRoutes);
+% router.use('/favoritos', favoritosRoutes);
+% router.use('/chatbot', chatRoutes);
+
+% module.exports = router;
+% \end{lstlisting}
+
+% Podemos ver un claro ejemplo de ruta y controlador en la ruta de /equipos, una de las mas importantes por su gran número de endpoints.
+
+% \begin{lstlisting}[caption=routes/equipos.js]
+% const express = require('express');
+% const router = express.Router();
+% const equipoController = require('../controllers/equipoController');
+
+% router.get('/', equipoController.getEquipos);
+% router.get('/:id', equipoController.getEquipoPorId);
+% router.get('/info/:id_equipo', equipoController.getInfoEquipo);
+% router.get('/partidos/:id_equipo', equipoController.getPartidosEquipoPorId);
+% //MAS ENDPOINTS...
+
+% module.exports = router;
+% \end{lstlisting}
+
+% \begin{lstlisting}[caption= función de controllers/EquipoController.js]
+% const pool = require('../config/db');
+
+% const getEquipos = async (req, res) => {
+%   try {
+%     const result = await pool.query(
+%       'SELECT id_equipo, nombre_equipo, logo FROM dim_equipo ORDER BY nombre_equipo'
+%     );
+
+%     res.json(result.rows);
+%   } catch (error) {
+%     console.error('Error al obtener los equipos:', error);
+%     res.status(500).json({ error: 'Error interno del servidor' });
+%   }
+% };
+% \end{lstlisting}
+
+% El flujo de trabajo sería:
+% \begin{enumerate}
+%     \item Frontend hace petición a endpoint, por ejemplo, /api/equipos
+%     \item Eso lleva a index.js, que redirige la llamada a equipos.js
+%     \item equipos.js llama a la función asociada a la ruta, en este caso getEquipos
+%     \item Consulta BD PostgreSQL y devuelve JSON con la información.
+% \end{enumerate}
+
+\subsubsection{Organización del \textit{backend}}
+
+El \textit{backend} sigue una arquitectura por capas con rutas, controladores y servicios, separando la lógica de acceso, procesamiento y exposición de servicios.
+
+\begin{lstlisting}[caption={Estructura del backend.}]
+backend/src/
+|
+|-- app.js
+|-- config/
+|-- controllers/
+|-- routes/
+|-- services/
+|-- utils/
+`-- prompts/
+\end{lstlisting}
+
+\begin{itemize}
+    \item {app.js:} Punto de entrada principal del servidor Express y configuración general de middleware y rutas.
+    
+    \item {config/:} Módulo encargado de la conexión con PostgreSQL y configuración del acceso a base de datos y servicios externos como la API de Gemini.
+    
+    \item {controllers/:} Contiene la lógica de negocio asociada a cada recurso del sistema. Cada controlador procesa peticiones HTTP, consulta la base de datos y devuelve respuestas estructuradas.
+    
+    \item {routes/:} Define los distintos endpoints de la API REST y enlaza cada ruta con su controlador correspondiente.
+    
+    \item {services/:} Agrupa lógica auxiliar más específica, como generación de SQL o procesamiento de respuestas del chatbot.
+
+    \item {utils/:} Contiene funciones de apoyo para el chatbot, por ejemplo, validación de SQL.
+    
+    \item {prompts/:} Contiene el \textit{prompt} usado para guiar al chatbot en la generación de consultas sobre la base de datos.
+
+    
+
+\end{itemize}
+
+Las carpetas routes y controllers son dos de las partes más importantes del \textit{backend}, ya que permiten separar la definición de los \textit{endpoints} de la lógica que se ejecuta cuando dichos \textit{endpoints} son llamados.
+
+La carpeta routes contiene los archivos que definen las rutas de la API. Es decir, establece qué URLs existen, qué método HTTP utilizan y qué controlador debe ejecutarse en cada caso. Por ejemplo, una ruta puede indicar que una petición GET a /equipos debe ejecutar la función getEquipos del controlador de equipos.
+
+La carpeta controllers contiene la lógica asociada a cada ruta. En estos archivos se reciben los parámetros enviados por el \textit{frontend}, se realizan las consultas a la base de datos, se controlan posibles errores y se devuelve la respuesta en formato JSON.
+
+Para documentar los \textit{endpoints} implementados, se ha integrado Swagger/OpenAPI en el propio \textit{backend}. Esta herramienta permite consultar la API de forma interactiva desde el navegador, agrupando las rutas por módulos funcionales como equipos, jugadores, partidos, temporadas, usuarios, favoritos, \textit{data mining} y chatbot.
+
+La documentación se genera a partir de los comentarios OpenAPI definidos en los archivos de rutas de Express y de una configuración central ubicada en \path{backend/src/config/swagger.js}. De esta forma, cada \textit{endpoint} queda descrito junto a su método HTTP, parámetros de ruta, parámetros de consulta, cuerpo de la petición cuando corresponde, posibles respuestas y ejemplos de uso.
+
+El acceso a esta documentación se realiza desde la ruta:
+
+\begin{center}
+\path{http://localhost:3000/api-docs}
+\end{center}
+
+Esta solución evita mantener en la memoria una tabla extensa y difícil de actualizar. Además, resulta más útil durante el desarrollo, ya que Swagger UI permite explorar los distintos grupos de rutas, revisar la estructura esperada de las peticiones y probar los \textit{endpoints} directamente contra el servidor local.
+
+% \subsection{Inicio de sesión y registro}
+% \subsection{Buscador global}
+% El backend incluye un buscador global que permite localizar jugadores y equipos desde un único endpoint. Esta funcionalidad se implementa mediante la ruta /api/buscador, que recibe el texto de búsqueda a través del parámetro q.
+
+% \begin{lstlisting}[caption = Ruta de buscador]
+% const express = require('express');
+% const router = express.Router();
+% const buscadorController = require('../controllers/buscadorController');
+
+% router.get('/', buscadorController.buscarGlobal);
+
+% module.exports = router;
+% \end{lstlisting}
+
+% \begin{lstlisting}[caption=Endpoint de buscador]
+% const buscarGlobal = async (req, res) => {
+%   const { q } = req.query;
+%   const busqueda = (q || '').trim();
+
+%   if (!busqueda || busqueda.length < 2) {
+%     return res.json([]);
+%   }
+
+%   const query = `
+%     (SELECT id_jugador AS id, nombre AS principal, nacionalidad AS secundario,
+%             foto AS imagen, 'jugador' AS tipo
+%      FROM dim_jugador
+%      WHERE LOWER(nombre) LIKE '%' || LOWER($1) || '%'
+%      LIMIT 5)
+%     UNION ALL
+%     (SELECT id_equipo AS id, nombre_equipo AS principal, pais AS secundario,
+%             logo AS imagen, 'equipo' AS tipo
+%      FROM dim_equipo
+%      WHERE LOWER(nombre_equipo) LIKE '%' || LOWER($1) || '%'
+%      LIMIT 5);
+%   `;
+
+%   const result = await pool.query(query, [busqueda]);
+%   res.json(result.rows);
+% };
+% \end{lstlisting}
+
+% El buscador consulta de forma conjunta las tablas dim\_jugador y dim\_equipo,
+% devolviendo los resultados con una estructura común: identificador, nombre
+% principal, información secundaria, imagen y tipo de resultado. De esta forma,
+% el frontend puede mostrar jugadores y equipos en una misma lista y navegar
+% después al detalle correspondiente. Ademas, la consulta completa prioriza las coincidencias exactas frente a las coincidencias parciales, para que los resultados mas relevantes aparezcan antes.
+
+% \subsection{Favoritos}
+
+% El backend permite que cada usuario pueda marcar equipos y jugadores como
+% favoritos. Esta funcionalidad se gestiona mediante el módulo favoritos, compuesto por una ruta para obtener los favoritos de un usuario y otra para alternar entre añadir o eliminar un favorito.
+
+% \begin{lstlisting}
+% const express = require('express');
+% const router = express.Router();
+% const favoritosController = require('../controllers/favoritosController');
+
+% router.post('/toggle', favoritosController.toggleFavorito);
+% router.get('/:id_usuario', favoritosController.getFavoritosUsuario);
+
+% module.exports = router;
+% \end{lstlisting}
+
+% La función toggleFavorito recibe el identificador del usuario, el identificador del elemento marcado y el tipo de favorito, que puede ser equipo o jugador. Si el favorito ya existe, se elimina; si no existe, se inserta en la tabla h\_usuario\_favoritos.
+
+% En el frontend, estos datos se consumen desde un contexto global de favoritos. Esto permite que las distintas pantallas puedan saber si un equipo o jugador ya está marcado como favorito y actualizar la interfaz al pulsar el botón con forma de corazón.
+
+\subsubsection{Chatbot}
+
+El \textit{backend} incorpora un módulo de chatbot que permite al usuario realizar preguntas en lenguaje natural sobre los datos de LaLiga. Su funcionamiento consiste en transformar la pregunta del usuario en una consulta SQL segura, ejecutarla sobre PostgreSQL y convertir los resultados obtenidos en una respuesta en lenguaje natural.
+
+Este chatbot utiliza una clave de API de Gemini proporcionada por Google AI Studio \cite{aistudio}, que permite acceder a los modelos de inteligencia artificial de Google. En este caso se emplea el modelo Gemini 2.5 Flash, ya que proporciona un equilibrio adecuado entre precisión y velocidad de respuesta.
+
+La conexión con la API de Gemini se configura en \path{config/gemini.js}. La clave utilizada se almacena en las variables de entorno del servidor, evitando que quede expuesta en el código fuente o en el \textit{frontend} de la aplicación.
+
+La ruta del chatbot define el \textit{endpoint} \path{/api/chatbot}, asociado a la función \texttt{contestarPregunta} del controlador. Este controlador coordina el flujo completo, desde la recepción de la pregunta hasta la generación de la respuesta final.
+
+La petición se envía en formato JSON e incluye la pregunta actual y, opcionalmente, el historial reciente de la conversación:
+
+\begin{verbatim}
+{
+  "pregunta": "¿Y cuántos goles marcó?",
+  "historial": [
+    {
+      "role": "user",
+      "text": "¿Quién es Andrés Iniesta?"
+    },
+    {
+      "role": "assistant",
+      "text": "Andrés Iniesta es un exfutbolista español..."
+    }
+  ]
+}
+\end{verbatim}
+
+El historial proporciona una memoria conversacional temporal. Gracias a ella, el usuario puede realizar preguntas consecutivas utilizando expresiones como ``¿cuántos goles marcó?'', ``¿en qué equipos jugó?'' o ``compáralo con Xavi'', sin tener que repetir el nombre del jugador en cada mensaje.
+
+Esta memoria se mantiene únicamente en el estado del \textit{frontend} y no se almacena en la base de datos ni en almacenamiento persistente. Se envían como máximo los últimos doce mensajes, equivalentes a seis intercambios entre el usuario y el asistente. Los mensajes iniciales, los errores y las preguntas que no hayan obtenido una respuesta válida quedan excluidos del historial. La conversación se elimina al iniciar un nuevo chat, cerrar sesión o reiniciar la aplicación.
+
+Antes de utilizar el historial, el \textit{backend} comprueba que sea un vector, que cada elemento contenga los campos esperados y que únicamente se utilicen los roles \texttt{user} y \texttt{assistant}. Además, limita nuevamente el número y la longitud de los mensajes. Esta validación evita depender exclusivamente de las restricciones aplicadas por el cliente.
+
+Una vez recibida y validada la petición, se pueden distinguir los siguientes pasos:
+
+\begin{enumerate}
+    \item Validación de la entrada: se comprueba que la pregunta sea una cadena de texto válida y se normaliza el historial conversacional. Las peticiones que no cumplan el formato esperado son rechazadas antes de realizar llamadas a Gemini.
+
+    \item Generación de SQL: la función \texttt{generarSQL} construye el \textit{prompt} enviado a Gemini combinando la pregunta actual, el historial reciente y el contexto SQL de la aplicación. Este contexto describe el esquema de la base de datos, las tablas disponibles y las reglas que debe cumplir la consulta generada. El historial se utiliza únicamente para resolver referencias a jugadores, equipos, temporadas o comparaciones, mientras que los datos solicitados siempre deben obtenerse mediante una nueva consulta SQL. El \textit{prompt} empleado para esta operación se muestra en el Listado~\ref{lst:prompt_sql_chatbot}.
+
+    \item Validación de seguridad: antes de ejecutar la consulta, se comprueba que sea una operación de solo lectura. Se permiten consultas que comiencen mediante \texttt{SELECT} o expresiones comunes de tabla mediante \texttt{WITH}, mientras que se bloquean instrucciones como \texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}, \texttt{DROP}, \texttt{ALTER}, \texttt{TRUNCATE} o \texttt{CREATE}. También se rechazan determinadas construcciones pertenecientes a otros dialectos SQL que no son compatibles con PostgreSQL.
+
+    \item Ejecución de la consulta: si la consulta supera la validación, se ejecuta sobre PostgreSQL. El resultado se obtiene como una colección de filas en formato JSON. Si la consulta no puede ejecutarse, el controlador captura el error y devuelve una respuesta controlada.
+
+    \item Generación de la respuesta natural: una vez obtenidos los datos, se realiza una segunda llamada a Gemini. En esta llamada se envían la pregunta, el historial conversacional, la consulta ejecutada y los resultados obtenidos. El modelo debe generar una respuesta breve, clara y en español, sin mencionar el SQL ni inventar información que no aparezca en los resultados. El \textit{prompt} utilizado para generar esta respuesta se incluye en el Listado~\ref{lst:prompt_respuesta_chatbot}.
+\end{enumerate}
+
+La respuesta del \textit{endpoint} conserva tanto la respuesta natural como los datos estructurados:
+
+\begin{verbatim}
+{
+  "pregunta": "¿Y cuántos goles marcó?",
+  "respuesta": "Iniesta marcó un total de ...",
+  "sql": "SELECT ...",
+  "resultado": [...]
+}
+\end{verbatim}
+
+Esta estructura permite mostrar directamente el texto generado por Gemini y, en futuras ampliaciones, utilizar los datos estructurados para representar tablas, tarjetas o gráficos en el \textit{frontend}.
+
+La implementación permite integrar inteligencia artificial sin conceder al modelo acceso directo e ilimitado a la base de datos. Gemini propone una consulta, pero su ejecución depende siempre de las validaciones realizadas por el servidor. Asimismo, la memoria conversacional mejora la naturalidad del diálogo sin almacenar información de forma persistente, mientras que la segunda llamada al modelo oculta al usuario la complejidad de la consulta SQL ejecutada.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

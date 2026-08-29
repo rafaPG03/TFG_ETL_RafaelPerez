@@ -1,0 +1,46 @@
+﻿id_equipo;nombre_equipo;necesidad;id_jugador;nombre_jugador;id_equipo_actual;equipo_actual;score_recomendacion;motivo
+529;Barcelona;Delantero;47323;Mikel Oyarzabal;548;Real Sociedad;0.6233;Gran capacidad goleadora y alto estado de forma.
+529;Barcelona;Delantero;6009;Julián Alvarez;530;Atletico Madrid;0.4111;Perfil muy similar al tipo de delantero requerido.
+529;Barcelona;Delantero;47582;Cucho Hernández;543;Real Betis;0.2111;Perfil muy similar al tipo de delantero requerido.
+531;Athletic Club;Delantero;343202;Álvaro Rodriguez;797;Elche;0.8281;Jugador joven con gran proyeccion.
+531;Athletic Club;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8272;Gran capacidad goleadora y alto estado de forma.
+531;Athletic Club;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.7778;Perfil muy similar al tipo de delantero requerido.
+532;Valencia;Delantero;47323;Mikel Oyarzabal;548;Real Sociedad;0.8944;Gran capacidad goleadora y alto estado de forma.
+532;Valencia;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8349;Gran capacidad goleadora y alto estado de forma.
+532;Valencia;Delantero;343202;Álvaro Rodriguez;797;Elche;0.8169;Jugador joven con gran proyeccion.
+539;Levante;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8231;Gran capacidad goleadora y alto estado de forma.
+539;Levante;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.6336;Perfil muy similar al tipo de delantero requerido.
+539;Levante;Delantero;51530;Federico Viñas;718;Oviedo;0.5712;Perfil muy similar al tipo de delantero requerido.
+539;Levante;Mediocentro;187214;Carlos Vicente;542;Alaves;0.8576;Perfil muy similar al tipo de mediocentro requerido.
+539;Levante;Mediocentro;162686;Antonio Blanco;542;Alaves;0.8018;Perfil muy similar al tipo de mediocentro requerido.
+539;Levante;Mediocentro;190485;Samú Costa;798;Mallorca;0.7705;Perfil muy similar al tipo de mediocentro requerido.
+542;Alaves;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8376;Gran capacidad goleadora y alto estado de forma.
+542;Alaves;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.6539;Perfil muy similar al tipo de delantero requerido.
+542;Alaves;Delantero;192032;Iván Romero;539;Levante;0.5869;Perfil muy similar al tipo de delantero requerido.
+546;Getafe;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8099;Gran capacidad goleadora y alto estado de forma.
+546;Getafe;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.583;Perfil muy similar al tipo de delantero requerido.
+546;Getafe;Delantero;51530;Federico Viñas;718;Oviedo;0.5428;Perfil muy similar al tipo de delantero requerido.
+547;Girona;Delantero;47323;Mikel Oyarzabal;548;Real Sociedad;0.8942;Gran capacidad goleadora y alto estado de forma.
+547;Girona;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8347;Gran capacidad goleadora y alto estado de forma.
+547;Girona;Delantero;343202;Álvaro Rodriguez;797;Elche;0.8147;Jugador joven con gran proyeccion.
+548;Real Sociedad;Defensa;1703;Andrei Rațiu;728;Rayo Vallecano;0.585;Excelente rendimiento defensivo y alta experiencia.
+548;Real Sociedad;Defensa;11421;Gabriel Suazo;536;Sevilla;0.5068;Excelente rendimiento defensivo y alta experiencia.
+548;Real Sociedad;Defensa;182661;Alvaro Núñez;797;Elche;0.4691;Excelente rendimiento defensivo y alta experiencia.
+548;Real Sociedad;Mediocentro;47463;Pepelu;532;Valencia;0.6923;Perfil muy similar al tipo de mediocentro requerido.
+548;Real Sociedad;Mediocentro;162686;Antonio Blanco;542;Alaves;0.6715;Perfil muy similar al tipo de mediocentro requerido.
+548;Real Sociedad;Mediocentro;41552;Pathé Ismaël Ciss;728;Rayo Vallecano;0.2958;Perfil muy similar al tipo de mediocentro requerido.
+718;Oviedo;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8274;Gran capacidad goleadora y alto estado de forma.
+718;Oviedo;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.6588;Perfil muy similar al tipo de delantero requerido.
+718;Oviedo;Delantero;192032;Iván Romero;539;Levante;0.5778;Perfil muy similar al tipo de delantero requerido.
+718;Oviedo;Mediocentro;187214;Carlos Vicente;542;Alaves;0.8775;Perfil muy similar al tipo de mediocentro requerido.
+718;Oviedo;Mediocentro;182770;Carlos Álvarez;539;Levante;0.8463;Jugador joven con gran proyeccion.
+718;Oviedo;Mediocentro;162686;Antonio Blanco;542;Alaves;0.8185;Perfil muy similar al tipo de mediocentro requerido.
+727;Osasuna;Delantero;47323;Mikel Oyarzabal;548;Real Sociedad;0.8945;Gran capacidad goleadora y alto estado de forma.
+727;Osasuna;Delantero;343202;Álvaro Rodriguez;797;Elche;0.8325;Jugador joven con gran proyeccion.
+727;Osasuna;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8218;Gran capacidad goleadora y alto estado de forma.
+728;Rayo Vallecano;Delantero;50048;Vedat Muriqi;798;Mallorca;0.8197;Gran capacidad goleadora y alto estado de forma.
+728;Rayo Vallecano;Delantero;192032;Iván Romero;539;Levante;0.551;Perfil muy similar al tipo de delantero requerido.
+728;Rayo Vallecano;Delantero;51530;Federico Viñas;718;Oviedo;0.5487;Perfil muy similar al tipo de delantero requerido.
+798;Mallorca;Delantero;128582;Jorge de Frutos;728;Rayo Vallecano;0.7966;Perfil muy similar al tipo de delantero requerido.
+798;Mallorca;Delantero;192032;Iván Romero;539;Levante;0.638;Perfil muy similar al tipo de delantero requerido.
+798;Mallorca;Delantero;51530;Federico Viñas;718;Oviedo;0.6072;Perfil muy similar al tipo de delantero requerido.

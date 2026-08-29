@@ -1,0 +1,13 @@
+modelo,objetivo,mae,rmse,r2,partidos_validacion,usado_para_prediccion
+RandomForestRegressor,goles_local,0.8633,1.1235,0.2016,802,True
+MLPRegressor,goles_local,0.8918,1.1378,0.1813,802,False
+SVR,goles_local,0.9228,1.2155,0.0655,802,False
+GradientBoostingRegressor,goles_local,0.9551,1.252,0.0086,802,False
+RandomForestRegressor,goles_visitante,0.7841,1.0059,0.1089,802,True
+MLPRegressor,goles_visitante,0.8376,1.0642,0.0026,802,False
+SVR,goles_visitante,0.846,1.1074,-0.08,802,False
+GradientBoostingRegressor,goles_visitante,0.8575,1.0853,-0.0373,802,False
+RandomForestRegressor,promedio,0.8237,1.0663,0.1791,1604,True
+MLPRegressor,promedio,0.8647,1.1016,0.1239,1604,False
+SVR,promedio,0.8844,1.1627,0.024,1604,False
+GradientBoostingRegressor,promedio,0.9063,1.1716,0.0091,1604,False

@@ -7,13 +7,14 @@ import pandas as pd
 import psycopg2
 
 
-BASE_DIR = Path(r'C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DSA_DM')
-OUTPUT_FILE = BASE_DIR / "perfil_estadistico_jugadores.csv"
+RUTA_RAIZ = Path(__file__).resolve().parents[2]
+RUTA_SALIDAS = RUTA_RAIZ / "DATA_MINING" / "DSA_DM"
+RUTA_SALIDA = RUTA_SALIDAS / "perfil_estadistico_jugadores.csv"
 TEMPORADA_ACTUAL = 2025
 C = 5
 
 
-def parse_args():
+def leer_argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Genera perfil_estadistico_jugadores.csv leyendo desde PostgreSQL"
     )
@@ -22,12 +23,12 @@ def parse_args():
     parser.add_argument("--db-name", default=os.getenv("PGDATABASE", "TFG_BDLaLiga"))
     parser.add_argument("--db-user", default=os.getenv("PGUSER", "postgres"))
     parser.add_argument("--db-password", default=os.getenv("PGPASSWORD", "betico18"))
-    parser.add_argument("--output", default=str(OUTPUT_FILE))
+    parser.add_argument("--output", default=str(RUTA_SALIDA))
     return parser.parse_args()
 
 
-def read_table(conn, query):
-    return pd.read_sql_query(query, conn)
+def leer_tabla(conexion, consulta: str) -> pd.DataFrame:
+    return pd.read_sql_query(consulta, conexion)
 
 
 def calcular_peso_temporal(anio):
@@ -92,7 +93,7 @@ def normalizar_rango_0_10(df: pd.DataFrame, columnas: list[str]) -> pd.DataFrame
         if pd.isna(maximo) or maximo <= 0:
             df_out[col] = 0.0
         else:
-            # El valor máximo de la columna se convierte en 10.
+            # El valor maximo de la columna se convierte en 10.
             df_out[col] = (serie / maximo) * 10
 
         df_out[col] = df_out[col].clip(0, 10).round(2)
@@ -141,21 +142,21 @@ def anadir_percentiles_por_grupo(
     return df_out
 
 
-def main():
-    args = parse_args()
-    conn = psycopg2.connect(
-        host=args.db_host,
-        port=args.db_port,
-        dbname=args.db_name,
-        user=args.db_user,
-        password=args.db_password,
+def main() -> None:
+    argumentos = leer_argumentos()
+    conexion = psycopg2.connect(
+        host=argumentos.db_host,
+        port=argumentos.db_port,
+        dbname=argumentos.db_name,
+        user=argumentos.db_user,
+        password=argumentos.db_password,
     )
 
     try:
-        df = read_table(conn, "SELECT * FROM public.h_jugador_temporada")
-        df_dim_jug = read_table(conn, "SELECT id_jugador, nombre FROM public.dim_jugador")
+        df = leer_tabla(conexion, "SELECT * FROM public.h_jugador_temporada")
+        df_dim_jug = leer_tabla(conexion, "SELECT id_jugador, nombre FROM public.dim_jugador")
     finally:
-        conn.close()
+        conexion.close()
 
     df.columns = df.columns.str.strip()
     df_dim_jug.columns = df_dim_jug.columns.str.strip()
@@ -166,7 +167,7 @@ def main():
     columnas_notas = ["ataque", "creacion", "defensa", "porteros", "duelos", "regates"]
     df[columnas_notas] = df.apply(calcular_indices, axis=1)
 
-    # Perfil por jugador y temporada: mantiene un valor distinto por cada año.
+    # Perfil por jugador y temporada: mantiene un valor distinto por cada temporada.
     perfil_jugador = (
         df.groupby(["id_jugador", "temporada"], as_index=False)[columnas_notas]
         .mean()
@@ -195,16 +196,16 @@ def main():
     # Normalizamos cada rating al rango [0, 10] dentro de cada temporada.
     perfil_final = normalizar_rango_0_10_por_grupo(perfil_final, columnas_notas, "temporada")
 
-    # Añadimos percentiles por stat dentro de cada temporada.
+    # Anadimos percentiles por stat dentro de cada temporada.
     perfil_final = anadir_percentiles_por_grupo(perfil_final, columnas_notas, "temporada")
 
     columnas_percentiles = [f"percentil_{col}" for col in columnas_notas]
     perfil_final = perfil_final[columnas_ordenadas + columnas_percentiles]
 
-    output_file = Path(args.output)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    perfil_final.to_csv(output_file, index=False, sep=";", encoding="utf-8-sig")
-    print(f"CSV sacado: {output_file}")
+    archivo_salida = Path(argumentos.output)
+    archivo_salida.parent.mkdir(parents=True, exist_ok=True)
+    perfil_final.to_csv(archivo_salida, index=False, sep=";", encoding="utf-8-sig")
+    print(f"Archivo generado: {archivo_salida}")
 
 
 if __name__ == "__main__":

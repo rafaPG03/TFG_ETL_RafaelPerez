@@ -1,140 +1,189 @@
-import pandas as pd
+import argparse
+import os
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
+import psycopg2
 
-# ------------------------------
-# Configuracion del usuario
-# ------------------------------
-# Ruta al CSV de probabilidades (elige el que corresponda a tu flujo)
-PRED_PATH = r"c:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DSA_DM\predicciones_partidos_incompletos.csv"
-# PRED_PATH = r"c:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DEMAS\PREDICCIONES_PARTIDOS\predicciones_partidos_incompletos.csv"
 
-# Ruta a la clasificacion actual por jornada
-TABLE_PATH = r"c:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA\h_equipo_jornada.csv"
+RUTA_RAIZ = Path(__file__).resolve().parents[2]
+RUTA_DM = RUTA_RAIZ / "DATA_MINING" / "DSA_DM"
+RUTA_PREDICCIONES = RUTA_DM / "predicciones_partidos_incompletos.csv"
+RUTA_SALIDA = RUTA_DM / "simulacion_montecarlo_laliga_resultados.csv"
 
-# Temporada a usar de la tabla (ajusta si no coincide con tus predicciones)
 TEMPORADA_ACTUAL = 2025
+DESEMPATE_DG = True
+DESEMPATE_ALEATORIO = False
 
-# Opciones de desempate
-DESEMPATE_DG = True  # usa una diferencia de goles minima simulada para desempatar
-DESEMPATE_ALEATORIO = False  # si True, desempata con ruido aleatorio en cada simulacion
-
-# Numero de simulaciones
 N_SIMULACIONES = 10000
-RNG_SEED = 42
+SEMILLA_ALEATORIA = 42
 
-# ------------------------------
-# Carga de datos
-# ------------------------------
-pred = pd.read_csv(PRED_PATH)
 
-# Normalizar columnas de probabilidades (por si llegan en %)
-prob_cols = ["prob_victoria_local", "prob_empate", "prob_victoria_visitante"]
-if pred[prob_cols].max().max() > 1.0:
-    pred[prob_cols] = pred[prob_cols] / 100.0
+def leer_argumentos() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Simula la liga leyendo la tabla actual desde PostgreSQL"
+    )
+    parser.add_argument("--db-host", default=os.getenv("PGHOST", "localhost"))
+    parser.add_argument("--db-port", default=os.getenv("PGPORT", "5432"))
+    parser.add_argument("--db-name", default=os.getenv("PGDATABASE", "TFG_BDLaLiga"))
+    parser.add_argument("--db-user", default=os.getenv("PGUSER", "postgres"))
+    parser.add_argument("--db-password", default=os.getenv("PGPASSWORD", "betico18"))
+    parser.add_argument("--predicciones", default=str(RUTA_PREDICCIONES))
+    parser.add_argument("--output", default=str(RUTA_SALIDA))
+    return parser.parse_args()
 
-# Asegurar que suman 1 (corrige posibles desviaciones)
-pred[prob_cols] = pred[prob_cols].div(pred[prob_cols].sum(axis=1), axis=0)
 
-# Tabla de clasificacion actual
-h = pd.read_csv(TABLE_PATH, sep=";")
+def leer_tabla(conexion, consulta: str) -> pd.DataFrame:
+    return pd.read_sql_query(consulta, conexion)
 
-# Filtrar temporada y ultima jornada disponible
-h_temporada = h[h["temporada"] == TEMPORADA_ACTUAL].copy()
-if h_temporada.empty:
-    raise ValueError("No hay datos en h_equipo_jornada.csv para la temporada indicada.")
 
-ultima_jornada = h_temporada["jornada"].max()
-tabla_actual = h_temporada[h_temporada["jornada"] == ultima_jornada].copy()
+def cargar_predicciones(ruta_predicciones: Path) -> pd.DataFrame:
+    predicciones = pd.read_csv(ruta_predicciones)
+    columnas_probabilidad = ["prob_victoria_local", "prob_empate", "prob_victoria_visitante"]
 
-equipos = tabla_actual[["id_equipo", "nombre_equipo", "puntos", "dg"]].drop_duplicates("id_equipo")
-equipos = equipos.sort_values("id_equipo").reset_index(drop=True)
+    if predicciones[columnas_probabilidad].max().max() > 1.0:
+        predicciones[columnas_probabilidad] = predicciones[columnas_probabilidad] / 100.0
 
-equipo_ids = equipos["id_equipo"].to_numpy()
-equipo_nombres = equipos["nombre_equipo"].to_numpy()
-puntos_base = equipos["puntos"].to_numpy(dtype=float)
-dg_base = equipos["dg"].to_numpy(dtype=float)
+    predicciones[columnas_probabilidad] = predicciones[columnas_probabilidad].div(
+        predicciones[columnas_probabilidad].sum(axis=1), axis=0
+    )
+    return predicciones
 
-# Filtrar partidos a equipos presentes en la tabla
-pred = pred[pred["id_local"].isin(equipo_ids) & pred["id_visitante"].isin(equipo_ids)].copy()
 
-# Indices para actualizaciones rapidas
-id_to_idx = {tid: i for i, tid in enumerate(equipo_ids)}
-local_idx = pred["id_local"].map(id_to_idx).to_numpy()
-visit_idx = pred["id_visitante"].map(id_to_idx).to_numpy()
+def cargar_clasificacion(argumentos: argparse.Namespace) -> pd.DataFrame:
+    conexion = psycopg2.connect(
+        host=argumentos.db_host,
+        port=argumentos.db_port,
+        dbname=argumentos.db_name,
+        user=argumentos.db_user,
+        password=argumentos.db_password,
+    )
 
-p_local = pred["prob_victoria_local"].to_numpy()
-p_empate = pred["prob_empate"].to_numpy()
+    try:
+        clasificacion = leer_tabla(
+            conexion,
+            """
+            SELECT
+                id_equipo,
+                nombre_equipo,
+                temporada,
+                jornada,
+                puntos,
+                dg
+            FROM public.h_equipo_temporada
+            """,
+        )
+    finally:
+        conexion.close()
 
-n_partidos = len(pred)
-if n_partidos == 0:
-    raise ValueError("No hay partidos pendientes tras filtrar por equipos.")
+    return clasificacion
 
-# ------------------------------
-# Simulacion Montecarlo
-# ------------------------------
-rng = np.random.default_rng(RNG_SEED)
 
-# Contadores por rango
-n_equipos = len(equipo_ids)
-cont_campeon = np.zeros(n_equipos, dtype=int)
-cont_champions = np.zeros(n_equipos, dtype=int)
-cont_europa = np.zeros(n_equipos, dtype=int)
-cont_mediatabla = np.zeros(n_equipos, dtype=int)
-cont_desc = np.zeros(n_equipos, dtype=int)
+def preparar_estado_inicial(clasificacion: pd.DataFrame) -> pd.DataFrame:
+    clasificacion_temporada = clasificacion[clasificacion["temporada"] == TEMPORADA_ACTUAL].copy()
+    if clasificacion_temporada.empty:
+        raise ValueError("No hay datos en la tabla para la temporada indicada.")
 
-for _ in range(N_SIMULACIONES):
-    puntos = puntos_base.copy()
-    dg = dg_base.copy()
+    ultima_jornada = clasificacion_temporada["jornada"].max()
+    tabla_actual = clasificacion_temporada[clasificacion_temporada["jornada"] == ultima_jornada].copy()
 
-    r = rng.random(n_partidos)
-    victoria_local = r < p_local
-    empate = (r >= p_local) & (r < (p_local + p_empate))
-    visitante_victoria = ~victoria_local & ~empate
+    equipos = tabla_actual[["id_equipo", "nombre_equipo", "puntos", "dg"]].drop_duplicates("id_equipo")
+    return equipos.sort_values("id_equipo").reset_index(drop=True)
 
-    # Puntos
-    np.add.at(puntos, local_idx[victoria_local], 3)
-    np.add.at(puntos, visit_idx[visitante_victoria], 3)
-    np.add.at(puntos, local_idx[empate], 1)
-    np.add.at(puntos, visit_idx[empate], 1)
 
-    # Diferencia de goles simple para desempate
-    if DESEMPATE_DG:
-        np.add.at(dg, local_idx[victoria_local], 1)
-        np.add.at(dg, visit_idx[victoria_local], -1)
-        np.add.at(dg, visit_idx[visitante_victoria], 1)
-        np.add.at(dg, local_idx[visitante_victoria], -1)
+def simular_liga(predicciones: pd.DataFrame, equipos: pd.DataFrame) -> pd.DataFrame:
+    ids_equipos = equipos["id_equipo"].to_numpy()
+    nombres_equipos = equipos["nombre_equipo"].to_numpy()
+    puntos_base = equipos["puntos"].to_numpy(dtype=float)
+    dg_base = equipos["dg"].to_numpy(dtype=float)
 
-    # Orden final (puntos desc, dg desc, nombre asc o ruido aleatorio)
-    if DESEMPATE_ALEATORIO:
-        empate_key = rng.random(n_equipos)
-    else:
-        empate_key = equipo_nombres
+    predicciones = predicciones[
+        predicciones["id_local"].isin(ids_equipos)
+        & predicciones["id_visitante"].isin(ids_equipos)
+    ].copy()
 
-    order = np.lexsort((empate_key, -dg, -puntos))
-    posiciones = np.empty(n_equipos, dtype=int)
-    posiciones[order] = np.arange(1, n_equipos + 1)
+    id_a_indice = {id_equipo: indice for indice, id_equipo in enumerate(ids_equipos)}
+    indices_local = predicciones["id_local"].map(id_a_indice).to_numpy()
+    indices_visitante = predicciones["id_visitante"].map(id_a_indice).to_numpy()
 
-    cont_campeon += (posiciones == 1)
-    cont_champions += (posiciones <= 4)
-    cont_europa += (posiciones >= 5) & (posiciones <= 7)
-    cont_mediatabla += (posiciones >= 8) & (posiciones <= 17)
-    cont_desc += (posiciones >= 18)
+    prob_local = predicciones["prob_victoria_local"].to_numpy()
+    prob_empate = predicciones["prob_empate"].to_numpy()
 
-# ------------------------------
-# Resultados
-# ------------------------------
-result = pd.DataFrame({
-    "id_equipo": equipo_ids,
-    "equipo": equipo_nombres,
-    "campeon_%": 100 * cont_campeon / N_SIMULACIONES,
-    "champions_%": 100 * cont_champions / N_SIMULACIONES,
-    "europa_%": 100 * cont_europa / N_SIMULACIONES,
-    "media_tabla_%": 100 * cont_mediatabla / N_SIMULACIONES,
-    "descenso_%": 100 * cont_desc / N_SIMULACIONES,
-}).sort_values(["campeon_%", "champions_%", "europa_%"], ascending=False)
+    n_partidos = len(predicciones)
+    if n_partidos == 0:
+        raise ValueError("No hay partidos pendientes tras filtrar por equipos.")
 
-print(result.to_string(index=False))
+    generador = np.random.default_rng(SEMILLA_ALEATORIA)
+    n_equipos = len(ids_equipos)
 
-# Guardar resultados en CSV
-output_path = r"c:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DSA_DM\simulacion_montecarlo_laliga_resultados.csv"
-result.to_csv(output_path, index=False)
+    contador_campeon = np.zeros(n_equipos, dtype=int)
+    contador_champions = np.zeros(n_equipos, dtype=int)
+    contador_europa = np.zeros(n_equipos, dtype=int)
+    contador_mediatabla = np.zeros(n_equipos, dtype=int)
+    contador_descenso = np.zeros(n_equipos, dtype=int)
+
+    for _ in range(N_SIMULACIONES):
+        puntos = puntos_base.copy()
+        dg = dg_base.copy()
+
+        aleatorios = generador.random(n_partidos)
+        victoria_local = aleatorios < prob_local
+        empate = (aleatorios >= prob_local) & (aleatorios < (prob_local + prob_empate))
+        victoria_visitante = ~victoria_local & ~empate
+
+        np.add.at(puntos, indices_local[victoria_local], 3)
+        np.add.at(puntos, indices_visitante[victoria_visitante], 3)
+        np.add.at(puntos, indices_local[empate], 1)
+        np.add.at(puntos, indices_visitante[empate], 1)
+
+        if DESEMPATE_DG:
+            np.add.at(dg, indices_local[victoria_local], 1)
+            np.add.at(dg, indices_visitante[victoria_local], -1)
+            np.add.at(dg, indices_visitante[victoria_visitante], 1)
+            np.add.at(dg, indices_local[victoria_visitante], -1)
+
+        if DESEMPATE_ALEATORIO:
+            clave_desempate = generador.random(n_equipos)
+        else:
+            clave_desempate = nombres_equipos
+
+        orden = np.lexsort((clave_desempate, -dg, -puntos))
+        posiciones = np.empty(n_equipos, dtype=int)
+        posiciones[orden] = np.arange(1, n_equipos + 1)
+
+        contador_campeon += posiciones == 1
+        contador_champions += posiciones <= 4
+        contador_europa += (posiciones >= 5) & (posiciones <= 7)
+        contador_mediatabla += (posiciones >= 8) & (posiciones <= 17)
+        contador_descenso += posiciones >= 18
+
+    return pd.DataFrame(
+        {
+            "id_equipo": ids_equipos,
+            "equipo": nombres_equipos,
+            "campeon_%": 100 * contador_campeon / N_SIMULACIONES,
+            "champions_%": 100 * contador_champions / N_SIMULACIONES,
+            "europa_%": 100 * contador_europa / N_SIMULACIONES,
+            "media_tabla_%": 100 * contador_mediatabla / N_SIMULACIONES,
+            "descenso_%": 100 * contador_descenso / N_SIMULACIONES,
+        }
+    ).sort_values(["campeon_%", "champions_%", "europa_%"], ascending=False)
+
+
+def main() -> None:
+    argumentos = leer_argumentos()
+    predicciones = cargar_predicciones(Path(argumentos.predicciones))
+    clasificacion = cargar_clasificacion(argumentos)
+    equipos = preparar_estado_inicial(clasificacion)
+    resultados = simular_liga(predicciones, equipos)
+
+    print(resultados.to_string(index=False))
+
+    archivo_salida = Path(argumentos.output)
+    archivo_salida.parent.mkdir(parents=True, exist_ok=True)
+    resultados.to_csv(archivo_salida, index=False)
+
+
+if __name__ == "__main__":
+    main()

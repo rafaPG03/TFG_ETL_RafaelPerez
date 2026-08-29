@@ -4,11 +4,12 @@ import psycopg2
 from psycopg2 import sql
 
 
-CSV_PATH = Path(r"c:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DSA_DM\perfil_estadistico_jugadores.csv")
-SCHEMA = "public"
-TABLE = "h_jugadores_ratings"
+RUTA_RAIZ = Path(__file__).resolve().parents[2]
+RUTA_CSV = RUTA_RAIZ / "DATA_MINING" / "DSA_DM" / "perfil_estadistico_jugadores.csv"
+ESQUEMA = "public"
+TABLA = "h_jugadores_ratings"
 
-DB_CONFIG = {
+CONFIGURACION_BD = {
     "host": "localhost",
     "port": 5432,
     "dbname": "TFG_Prueba",
@@ -16,7 +17,7 @@ DB_CONFIG = {
     "password": "betico18",
 }
 
-COLUMNS = [
+COLUMNAS = [
     "id_jugador",
     "temporada",
     "nombre",
@@ -35,10 +36,10 @@ COLUMNS = [
 ]
 
 
-def ensure_table(cur):
-    create_table = sql.SQL(
+def asegurar_tabla(cursor) -> None:
+    consulta_creacion = sql.SQL(
         """
-        CREATE TABLE IF NOT EXISTS {schema}.{table} (
+        CREATE TABLE IF NOT EXISTS {esquema}.{tabla} (
             id_jugador INTEGER NOT NULL,
             temporada INTEGER NOT NULL,
             nombre TEXT,
@@ -57,60 +58,60 @@ def ensure_table(cur):
             PRIMARY KEY (id_jugador, temporada)
         )
         """
-    ).format(schema=sql.Identifier(SCHEMA), table=sql.Identifier(TABLE))
-    cur.execute(create_table)
+    ).format(esquema=sql.Identifier(ESQUEMA), tabla=sql.Identifier(TABLA))
+    cursor.execute(consulta_creacion)
 
 
-def copy_upsert_from_csv(cur, csv_path):
-    temp_table = f"tmp_{TABLE}"
-    create_temp = sql.SQL(
-        "CREATE TEMP TABLE {temp} (LIKE {schema}.{table} INCLUDING ALL EXCLUDING CONSTRAINTS)"
+def cargar_csv_con_upsert(cursor, ruta_csv: Path) -> None:
+    tabla_temporal = f"tmp_{TABLA}"
+    consulta_temporal = sql.SQL(
+        "CREATE TEMP TABLE {temporal} (LIKE {esquema}.{tabla} INCLUDING ALL EXCLUDING CONSTRAINTS)"
     ).format(
-        temp=sql.Identifier(temp_table),
-        schema=sql.Identifier(SCHEMA),
-        table=sql.Identifier(TABLE),
+        temporal=sql.Identifier(tabla_temporal),
+        esquema=sql.Identifier(ESQUEMA),
+        tabla=sql.Identifier(TABLA),
     )
-    cur.execute(create_temp)
+    cursor.execute(consulta_temporal)
 
-    copy_sql = sql.SQL(
-        "COPY {temp} ({cols}) FROM STDIN WITH (FORMAT csv, HEADER true, DELIMITER ';', NULL '')"
+    consulta_copia = sql.SQL(
+        "COPY {temporal} ({columnas}) FROM STDIN WITH (FORMAT csv, HEADER true, DELIMITER ';', NULL '')"
     ).format(
-        temp=sql.Identifier(temp_table),
-        cols=sql.SQL(", ").join(sql.Identifier(c) for c in COLUMNS),
+        temporal=sql.Identifier(tabla_temporal),
+        columnas=sql.SQL(", ").join(sql.Identifier(columna) for columna in COLUMNAS),
     )
-    with csv_path.open("r", encoding="utf-8", newline="") as csv_file:
-        cur.copy_expert(copy_sql.as_string(cur), csv_file)
+    with ruta_csv.open("r", encoding="utf-8", newline="") as archivo_csv:
+        cursor.copy_expert(consulta_copia.as_string(cursor), archivo_csv)
 
-    update_cols = [
-        c for c in COLUMNS if c not in ("id_jugador", "temporada")
+    columnas_actualizables = [
+        columna for columna in COLUMNAS if columna not in ("id_jugador", "temporada")
     ]
-    updates = sql.SQL(", ").join(
-        sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(c), sql.Identifier(c))
-        for c in update_cols
+    actualizaciones = sql.SQL(", ").join(
+        sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(columna), sql.Identifier(columna))
+        for columna in columnas_actualizables
     )
-    insert_sql = sql.SQL(
-        "INSERT INTO {schema}.{table} ({cols}) "
-        "SELECT {cols} FROM {temp} "
-        "ON CONFLICT (id_jugador, temporada) DO UPDATE SET {updates}"
+    consulta_insercion = sql.SQL(
+        "INSERT INTO {esquema}.{tabla} ({columnas}) "
+        "SELECT {columnas} FROM {temporal} "
+        "ON CONFLICT (id_jugador, temporada) DO UPDATE SET {actualizaciones}"
     ).format(
-        schema=sql.Identifier(SCHEMA),
-        table=sql.Identifier(TABLE),
-        cols=sql.SQL(", ").join(sql.Identifier(c) for c in COLUMNS),
-        temp=sql.Identifier(temp_table),
-        updates=updates,
+        esquema=sql.Identifier(ESQUEMA),
+        tabla=sql.Identifier(TABLA),
+        columnas=sql.SQL(", ").join(sql.Identifier(columna) for columna in COLUMNAS),
+        temporal=sql.Identifier(tabla_temporal),
+        actualizaciones=actualizaciones,
     )
-    cur.execute(insert_sql)
+    cursor.execute(consulta_insercion)
 
 
-def main():
-    if not CSV_PATH.exists():
-        raise FileNotFoundError(f"No se encuentra el CSV: {CSV_PATH}")
+def main() -> None:
+    if not RUTA_CSV.exists():
+        raise FileNotFoundError(f"No se encuentra el CSV: {RUTA_CSV}")
 
-    with psycopg2.connect(**DB_CONFIG) as conn:
-        with conn.cursor() as cur:
-            ensure_table(cur)
-            copy_upsert_from_csv(cur, CSV_PATH)
-        conn.commit()
+    with psycopg2.connect(**CONFIGURACION_BD) as conexion:
+        with conexion.cursor() as cursor:
+            asegurar_tabla(cursor)
+            cargar_csv_con_upsert(cursor, RUTA_CSV)
+        conexion.commit()
 
 
 if __name__ == "__main__":

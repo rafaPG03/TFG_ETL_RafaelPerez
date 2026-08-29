@@ -4,7 +4,7 @@
 
 CREATE TABLE dm_simulacion_montecarlo (
     id_equipo INT NOT NULL,
-    temporada INT NOT NULL,
+    equipo VARCHAR(150),
 
     campeon_pct NUMERIC(5,2),
     champions_pct NUMERIC(5,2),
@@ -12,9 +12,7 @@ CREATE TABLE dm_simulacion_montecarlo (
     media_tabla_pct NUMERIC(5,2),
     descenso_pct NUMERIC(5,2),
 
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id_equipo, temporada)
+    PRIMARY KEY (id_equipo)
 );
 
 -- =====================================================
@@ -28,8 +26,6 @@ CREATE TABLE dm_probables_goleadores (
 
     nombre_jugador VARCHAR(150),
     probabilidad NUMERIC(5,3),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id_partido, id_jugador)
 );
@@ -52,10 +48,7 @@ CREATE TABLE dm_prediccion_partidos (
     prob_victoria_local NUMERIC(5,2),
     prob_empate NUMERIC(5,2),
     prob_victoria_visitante NUMERIC(5,2),
-
-    prediccion VARCHAR(50),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    prediccion VARCHAR(50)
 );
 
 -- =====================================================
@@ -69,11 +62,7 @@ CREATE TABLE dm_necesidades_plantilla (
     necesidad VARCHAR(100),
     motivo VARCHAR(300),
 
-    umbral_pct NUMERIC(5,2),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id_equipo, temporada, necesidad)
+    PRIMARY KEY (id_equipo, necesidad)
 );
 
 -- =====================================================
@@ -90,9 +79,7 @@ CREATE TABLE dm_estado_forma_jugadores (
 
     score_temporada NUMERIC(6,2),
     score_reciente NUMERIC(6,2),
-    evolucion NUMERIC(6,2),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    evolucion NUMERIC(6,2)
 );
 
 -- =====================================================
@@ -108,38 +95,7 @@ CREATE TABLE dm_estado_forma_equipos (
     estado VARCHAR(50),
 
     tendencia NUMERIC(6,2),
-    variabilidad NUMERIC(6,2),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- =====================================================
--- PERFIL ESTADISTICO DE JUGADORES
--- =====================================================
-
-CREATE TABLE dm_perfil_estadistico_jugadores (
-    id_jugador INT NOT NULL,
-    temporada INT NOT NULL,
-
-    nombre VARCHAR(150),
-
-    ataque NUMERIC(5,2),
-    creacion NUMERIC(5,2),
-    defensa NUMERIC(5,2),
-    porteros NUMERIC(5,2),
-    duelos NUMERIC(5,2),
-    regates NUMERIC(5,2),
-
-    percentil_ataque NUMERIC(5,2),
-    percentil_creacion NUMERIC(5,2),
-    percentil_defensa NUMERIC(5,2),
-    percentil_porteros NUMERIC(5,2),
-    percentil_duelos NUMERIC(5,2),
-    percentil_regates NUMERIC(5,2),
-
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id_jugador, temporada)
+    variabilidad NUMERIC(6,2)
 );
 
 -- =====================================================
@@ -150,13 +106,52 @@ CREATE TABLE dm_similitud_jugadores (
     id_jugador INT NOT NULL,
     temporada INT NOT NULL,
 
-    nombre_jugador VARCHAR(150),
+    nombre VARCHAR(150),
+    posicion VARCHAR(50),
+    cluster INT,
 
-    cluster_id INT,
-    perfil_cluster VARCHAR(100),
+    id_similar1 INT,
+    nombre_similar1 VARCHAR(150),
+    similitud1 NUMERIC(8,4),
 
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_similar2 INT,
+    nombre_similar2 VARCHAR(150),
+    similitud2 NUMERIC(8,4),
+
+    id_similar3 INT,
+    nombre_similar3 VARCHAR(150),
+    similitud3 NUMERIC(8,4),
+
+    id_similar4 INT,
+    nombre_similar4 VARCHAR(150),
+    similitud4 NUMERIC(8,4),
+
+    id_similar5 INT,
+    nombre_similar5 VARCHAR(150),
+    similitud5 NUMERIC(8,4),
 
     PRIMARY KEY (id_jugador, temporada)
+);
+
+-- =====================================================
+-- RECOMENDACION DE FICHAJES
+-- =====================================================
+
+CREATE TABLE dm_recomendacion_fichajes (
+    id_equipo INT NOT NULL,
+    nombre_equipo VARCHAR(150),
+
+    necesidad VARCHAR(100) NOT NULL,
+
+    id_jugador INT NOT NULL,
+    nombre_jugador VARCHAR(150),
+
+    id_equipo_actual INT,
+    equipo_actual VARCHAR(150),
+
+    score_recomendacion NUMERIC(8,4),
+    motivo VARCHAR(300),
+
+    PRIMARY KEY (id_equipo, necesidad, id_jugador)
 );
 

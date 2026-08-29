@@ -1,0 +1,79 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+\raggedbottom
+A continuación, se describe la motivación de este proyecto y su alcance. También se incluye un glosario de términos y la organización del resto de la memoria.
+
+\section{Motivación}
+En los últimos años, el fútbol profesional ha vivido una profunda transformación impulsada por la digitalización. La analítica de datos ha pasado de ser un recurso complementario a convertirse en una herramienta fundamental para la toma de decisiones deportivas, económicas y tácticas. Hoy en día, el rendimiento de un equipo o de un jugador ya no se analiza únicamente a partir de la experiencia de entrenadores y ojeadores, sino también mediante una enorme cantidad de información obtenida gracias a tecnologías como los sistemas de seguimiento de jugadores (\textit{tracking}), los dispositivos \textit{wearables} o el registro detallado de cada acción que ocurre durante un partido. Todo este volumen de datos ha hecho que disciplinas como la minería de datos y el aprendizaje automático (\textit{machine learning}) cobren un papel protagonista, permitiendo convertir la información en conocimiento útil y en una ventaja competitiva tanto dentro como fuera del terreno de juego.
+
+En este contexto, numerosos clubes de primer nivel han incorporado la inteligencia artificial a sus procesos de trabajo. Equipos como el Real Madrid o el Real Betis Balompié utilizan modelos capaces de analizar el rendimiento de jugadores y equipos, diseñar estrategias adaptadas al rival y mejorar los procesos de captación de talento y planificación de fichajes. Para ello recurren a métricas avanzadas como los goles esperados (xG), las asistencias esperadas (xA), el valor de acción (VAEP) o técnicas de agrupamiento (\textit{clustering}), que permiten identificar futbolistas con perfiles similares. Estas herramientas ayudan a reducir la incertidumbre en decisiones deportivas y económicas de gran impacto, demostrando el valor que tiene el análisis de datos en el fútbol moderno.
+
+Sin embargo, esta evolución tecnológica no está al alcance de todos. Mientras que los grandes clubes cuentan con departamentos especializados y herramientas de análisis de alto coste, la mayoría de equipos de categorías inferiores, academias, periodistas deportivos e incluso aficionados tienen un acceso muy limitado a este tipo de recursos. Esta diferencia genera una importante brecha tecnológica que dificulta la utilización de metodologías avanzadas fuera de las organizaciones con mayor capacidad económica.
+
+En este sentido, el presente Trabajo de Fin de Grado pretende contribuir a reducir esa desigualdad. Desde el punto de vista académico, supone el desarrollo de una aplicación que integra una arquitectura de datos, técnicas de minería de datos y modelos de aprendizaje automático sobre información histórica del fútbol profesional. Al mismo tiempo, busca acercar estas tecnologías a un público mucho más amplio, facilitando el acceso a herramientas que, hasta ahora, estaban reservadas prácticamente a los grandes clubes.
+
+En este contexto surge la motivación del presente Trabajo Fin de Grado, cuyo objetivo consiste en desarrollar una aplicación móvil que integre en una única plataforma un \textit{data warehouse}, técnicas de minería de datos, modelos de aprendizaje automático y herramientas de \textit{business intelligence} para facilitar el análisis del fútbol profesional. A partir de datos históricos de LaLiga, la aplicación implementa algoritmos como \textit{random forest}, \textit{K-means} y simulaciones de Monte Carlo con el fin de generar indicadores avanzados, predicciones y análisis estadísticos que posteriormente se representan mediante \textit{dashboards} interactivos. Además, incorpora un asistente conversacional basado en inteligencia artificial que permite consultar toda la información almacenada utilizando lenguaje natural. La plataforma está pensada tanto para perfiles técnicos, como analistas de equipos modestos u ojeadores independientes, como para cualquier aficionado interesado en comprender mejor el juego a través de los datos. Para ello, presenta métricas y resultados complejos mediante una interfaz intuitiva, visual e interactiva, haciendo que su interpretación resulte sencilla incluso para usuarios sin conocimientos especializados. En definitiva, este proyecto pretende demostrar que las técnicas avanzadas de ciencia de datos pueden integrarse en una herramienta accesible y útil, acercando el análisis profesional del fútbol a un público mucho más amplio.
+\section{Objetivos} 
+El propósito fundamental de este trabajo es la creación de un ecosistema tecnológico que transforme los datos brutos del fútbol en información estratégica mediante técnicas de inteligencia de negocio.
+
+El objetivo general es diseñar y desarrollar una plataforma integral de inteligencia de negocio que, mediante la aplicación de técnicas de aprendizaje automático y una interfaz multiplataforma, proporcione análisis estadísticos avanzados y simulaciones predictivas sobre la Primera División de la Liga Española de fútbol.
+
+Los objetivos específicos se dividen de la siguiente forma:
+\begin{itemize}
+    \item Ingesta y gestión de datos: implementar un sistema de ingesta de datos que permita consolidar una base de datos histórica robusta y fiable.
+    \item Diseño de arquitectura BI: definir una infraestructura de inteligencia de negocio que organice la información en modelos de datos eficientes para su posterior análisis.
+    \item Modelado predictivo: aplicar algoritmos de minería de datos para la predicción de resultados y el análisis del rendimiento deportivo.
+    \item Implementación multiplataforma: diseñar e implementar una aplicación móvil accesible que presente las analíticas a través de \textit{dashboards} interactivos.
+\end{itemize}
+\section{Alcance}
+
+El alcance de este proyecto abarca desde la fase de recolección de datos hasta el despliegue de un prototipo funcional de visualización. En el plano funcional, el sistema incluirá un módulo de analítica detallada tanto a nivel de equipo como de jugador, permitiendo observar métricas de rendimiento como la efectividad en pases, posesión y rachas históricas. Asimismo, se integrará un componente de predicción de encuentros que permitirá a los usuarios estimar la probabilidad de victoria local, empate o victoria visitante.
+
+
+El análisis se centrará exclusivamente en la competición de la Primera División Española, excluyendo por el momento torneos internacionales u otras categorías. De igual forma, el sistema procesará únicamente datos tabulares y estadísticos, dejando fuera del alcance el procesamiento de vídeo en tiempo real o el análisis de imágenes térmicas. Cabe destacar que la aplicación tiene una finalidad estrictamente informativa y académica; por lo tanto, no se integrarán pasarelas de pago ni funcionalidades relacionadas con apuestas reales, priorizando en todo momento la precisión del análisis de datos y la experiencia de usuario en la interpretación de estos.
+
+\section{Glosario de términos} 
+Esta sección expone una lista de los principales términos, acrónimos y abreviaturas utilizados a lo largo del documento:
+\begin{itemize}
+    \item BI - Business Intelligence:  conjunto de tecnologías, aplicaciones y procesos que transforman datos brutos en información estratégica, estructurada y accionable.
+    \item API - Application Programming Interface (interfaz de programación de aplicaciones): conjunto de reglas y especificaciones que permite a diferentes aplicaciones de \textit{software} comunicarse entre sí.
+    \item KPI - Key Performance Indicator (indicador clave de rendimiento): métrica cuantificable que evalúa el éxito y el progreso de una organización, proyecto o empleado hacia un objetivo estratégico.
+    \item IA - Inteligencia Artificial: es un campo de la informática que desarrolla sistemas capaces de realizar tareas que normalmente requieren inteligencia humana.
+    \item ML - Machine Learning (aprendizaje automático): es una rama de la inteligencia artificial que dota a los ordenadores de la capacidad de identificar patrones en datos masivos y elaborar predicciones sin necesidad de ser programados explícitamente con reglas rígidas.
+    \item SQL - Structured Query Language (lenguaje de consulta estructurada), lenguaje de programación utilizado para gestionar bases de datos relacionales.
+    \item NoSQL - Not only SQL (no solo SQL), lenguaje de programación utilizado para gestionar bases de datos no relacionales.
+    \item SGBD - Sistema de Gestión de Base de Datos, \textit{software} que permite gestionar, almacenar y recuperar bases de datos.
+    \item JSON - JavaScript Object Notation (notación de objetos en JavaScript), formato ligero y legible por humanos para el intercambio de datos.
+    \item ETL - Extract, Transform and Load (extracción, transformación y carga): proceso que permite a las organizaciones mover datos desde múltiples fuentes, reformatearlos y limpiarlos, y cargarlos en otra base de datos  o \textit{data warehouse} para analizarlos.
+    \item ISO/IEC 25010: estándar internacional que define un modelo para evaluar la calidad de los productos y sistemas de \textit{software}.
+    \item CSV - Comma-Separated Values (valores separados por comas): formato de texto plano utilizado para representar datos en forma de tabla.
+    \item DM - Data Mining (minería de datos): proceso de analizar grandes volúmenes de información para descubrir patrones, tendencias y relaciones ocultas.
+    \item DW - Data Warehouse (almacén de datos): repositorio centralizado que recopila, integra y organiza grandes volúmenes de datos históricos provenientes de múltiples fuentes de una empresa.
+    \item IDE - Integrated Development Environment (entorno de desarrollo integrado): es un programa o aplicación de SOFTWARE que utilizan los programadores para crear, editar, probar y organizar código en un solo lugar. 
+    \item URL - Uniform Resource Locator (localizador uniforme de recursos) es la dirección única que identifica a una página web, imagen, vídeo o cualquier otro recurso disponible en internet.
+    \item HTTP - Hypertext Transfer Protocol (protocolo de transferencia de hipertexto), protocolo fundamental para la comunicación en la World Wide Web (WWW).
+    \item SVR - Support Vector Regressor (regresor de vectores de soporte), método de regresión basado en márgenes que ignora a propósito los errores pequeños, maneja relaciones no lineales mediante \textit{kernels} y se mantiene firme ante datos ruidosos del mundo real donde la regresión estándar se queda corta.
+\end{itemize}
+
+\section{Organización del documento}
+El documento se compone de una serie de capítulos, cuyos contenidos son los siguientes:
+\begin{itemize}
+    \item Introducción: se explica de forma general el proyecto, presentando las motivaciones para realizarlo, sus objetivos y alcance y un glosario de términos.
+    \item Antecedentes: se analiza el estado actual en el ámbito de la minería de datos en estudios deportivos. Además, se compara con otras aplicaciones del sector.
+    \item Plan de Gestión del Proyecto: se detalla la forma en la que se tiene pensado desarrollar el proyecto, su metodología, planificación, tecnologías utilizadas y costes.
+      \item Requisitos del sistema: se describen los objetivos de negocio de la aplicación, así como los requisitos funcionales y no funcionales que debe cumplir el sistema para satisfacer las necesidades identificadas.
+    \item Análisis del sistema: se analiza la estructura funcional de la aplicación mediante modelos de entidad-relación, casos de uso y diagramas de navegación, definiendo el comportamiento esperado del sistema sin entrar en detalles de implementación.
+    \item Diseño del sistema: se presenta la solución técnica adoptada, incluyendo la arquitectura de la aplicación, el diseño físico de la base de datos, las tablas de \textit{data mining} y el diseño de la interfaz de usuario.
+    \item Construcción del sistema: se detallan los aspectos técnicos de la implementación, describiendo la estructura del proyecto, el desarrollo de la API, la aplicación móvil y la implementación de los algoritmos de análisis y minería de datos.
+    \item Pruebas del sistema: se presentan las pruebas que han sido realizadas.
+\end{itemize}
+
+
+
+

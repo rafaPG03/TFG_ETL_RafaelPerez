@@ -1,38 +1,28 @@
 import argparse
-import os
-import pandas as pd
-import numpy as np
-from pathlib import Path
 import importlib
+import os
+from pathlib import Path
 
-# ============================================================================
-# MODELO MEJORADO DE ESTADO DE FORMA - TEMPORADA 2025
-# ============================================================================
-# Cambios clave:
-# 1. Ponderación temporal exponencial (partidos recientes pesan más)
-# 2. Bonus aditivo por rivales en lugar de multiplicativo
-# 3. Análisis xG mejorado con métricas de "suerte"
-# 4. Arquitectura modular con funciones
-# 5. Validación de datos y manejo de errores
-# 6. Métricas adicionales (tendencia, variabilidad)
-# ============================================================================
+import numpy as np
+import pandas as pd
 
-# CONFIGURACIÓN
+
 TEMPORADA_TARGET = 2025
 NUM_PARTIDOS = 5
-BONUS_TOP6 = 0.5  # Bonus más generoso por rival difícil
-PONDERACION_TEMPORAL = 0.85  # Decay exponencial para partidos antiguos
+BONUS_TOP6 = 0.5
+PONDERACION_TEMPORAL = 0.85
 
-# Umbrales de clasificación (más permisivos)
-UMBRAL_POSITIVO = 5.5  # Antes era 7
-UMBRAL_CRITICO = 3.2  # Antes era 4
-FACTOR_NORMALIZACION = 3.0  # Antes era 4.3 (permite puntuaciones más altas)
+UMBRAL_POSITIVO = 5.5
+UMBRAL_CRITICO = 3.2
+FACTOR_NORMALIZACION = 3.0
 
-BASE_DIR = Path(r'C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATA_MINING\DSA_DM')
-OUTPUT_FILE = BASE_DIR / "ESTADO_FORMA_EQUIPOS_2025.csv"
+RUTA_RAIZ = Path(__file__).resolve().parents[2]
+RUTA_SALIDAS = RUTA_RAIZ / "DATA_MINING" / "DSA_DM"
+RUTA_SALIDA = RUTA_SALIDAS / "ESTADO_FORMA_EQUIPOS_2025.csv"
+RUTA_SALIDA_TODAS = RUTA_SALIDAS / "ESTADO_FORMA_EQUIPOS_TODAS_TEMPORADAS.csv"
 
 
-def parse_args() -> argparse.Namespace:
+def leer_argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Calcula estado de forma leyendo datos desde PostgreSQL"
     )
@@ -41,17 +31,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db-name", default=os.getenv("PGDATABASE", "TFG_BDLaLiga"))
     parser.add_argument("--db-user", default=os.getenv("PGUSER", "postgres"))
     parser.add_argument("--db-password", default=os.getenv("PGPASSWORD", "betico18"))
-    parser.add_argument("--output", default=str(OUTPUT_FILE))
+    parser.add_argument("--output", default=str(RUTA_SALIDA))
+    parser.add_argument("--output-todas", default=str(RUTA_SALIDA_TODAS))
     return parser.parse_args()
 
 
-def read_table(conn, query: str) -> pd.DataFrame:
-    return pd.read_sql_query(query, conn)
+def leer_tabla(conexion, consulta: str) -> pd.DataFrame:
+    return pd.read_sql_query(consulta, conexion)
 
 
-def cargar_datos(args: argparse.Namespace):
-    """Carga y limpia los datos necesarios desde PostgreSQL."""
-    print("📥 Cargando datos...")
+def cargar_datos(argumentos: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    print("Cargando datos...")
     try:
         psycopg2 = importlib.import_module("psycopg2")
     except ModuleNotFoundError as exc:
@@ -59,17 +49,17 @@ def cargar_datos(args: argparse.Namespace):
             "Falta psycopg2 en el entorno actual. Instala: pip install psycopg2-binary"
         ) from exc
 
-    conn = psycopg2.connect(
-        host=args.db_host,
-        port=args.db_port,
-        dbname=args.db_name,
-        user=args.db_user,
-        password=args.db_password,
+    conexion = psycopg2.connect(
+        host=argumentos.db_host,
+        port=argumentos.db_port,
+        dbname=argumentos.db_name,
+        user=argumentos.db_user,
+        password=argumentos.db_password,
     )
 
     try:
-        df_partidos = read_table(
-            conn,
+        partidos = leer_tabla(
+            conexion,
             """
             SELECT
                 id_partido,
@@ -82,9 +72,8 @@ def cargar_datos(args: argparse.Namespace):
             FROM public.dim_partidos
             """,
         )
-
-        df_stats = read_table(
-            conn,
+        estadisticas = leer_tabla(
+            conexion,
             """
             SELECT
                 id_partido,
@@ -93,9 +82,8 @@ def cargar_datos(args: argparse.Namespace):
             FROM public.h_equipo_partido
             """,
         )
-
-        df_clasificacion = read_table(
-            conn,
+        clasificacion = leer_tabla(
+            conexion,
             """
             SELECT
                 t.id_equipo,
@@ -108,193 +96,255 @@ def cargar_datos(args: argparse.Namespace):
             """,
         )
     finally:
-        conn.close()
+        conexion.close()
 
-    # Limpieza de espacios en nombres
-    for df in [df_partidos, df_stats, df_clasificacion]:
-        df.columns = df.columns.str.strip()
+    for datos in [partidos, estadisticas, clasificacion]:
+        datos.columns = datos.columns.str.strip()
 
-    return df_partidos, df_stats, df_clasificacion
+    return partidos, estadisticas, clasificacion
 
-def obtener_info_equipos_temporada(df_clasificacion, temporada):
-    """Obtiene equipos y ranking de una temporada."""
-    df_temp = df_clasificacion[df_clasificacion['temporada'] == temporada].copy()
 
-    if not df_temp.empty and 'jornada' in df_temp.columns:
-        idx = df_temp.groupby('id_equipo')['jornada'].idxmax()
-        df_temp = df_temp.loc[idx].copy()
-    
-    if df_temp.empty:
-        print(f"⚠️  Advertencia: No hay datos para la temporada {temporada}")
+def obtener_info_equipos_temporada(
+    clasificacion: pd.DataFrame, temporada: int
+) -> tuple[pd.DataFrame, list[int]]:
+    datos_temporada = clasificacion[clasificacion["temporada"] == temporada].copy()
+
+    if not datos_temporada.empty and "jornada" in datos_temporada.columns:
+        indices = datos_temporada.groupby("id_equipo")["jornada"].idxmax()
+        datos_temporada = datos_temporada.loc[indices].copy()
+
+    if datos_temporada.empty:
+        print(f"Advertencia: no hay datos para la temporada {temporada}")
         return pd.DataFrame(), []
-    
-    equipos_top6 = df_temp.nsmallest(6, 'posicion')['id_equipo'].tolist()
-    return df_temp, equipos_top6
 
-def calcular_puntos_base(goles_favor, goles_contra):
-    """Calcula puntos base por resultado (0, 1 o 3)."""
+    equipos_top6 = datos_temporada.nsmallest(6, "posicion")["id_equipo"].tolist()
+    return datos_temporada, equipos_top6
+
+
+def calcular_puntos_base(goles_favor: float, goles_contra: float) -> int:
     if goles_favor > goles_contra:
         return 3
-    elif goles_favor == goles_contra:
+    if goles_favor == goles_contra:
         return 1
-    else:
-        return 0
+    return 0
 
-def aplicar_ajustes_xg(puntos, goles_favor, goles_contra, xg_propio, xg_rival):
-    """
-    Ajusta puntos basado en xG para capturar "suerte" (fortuna/desgracia).
-    Lógica más permisiva: menos penalizaciones, más bonos.
-    """
+
+def aplicar_ajustes_xg(
+    puntos: float,
+    goles_favor: float,
+    goles_contra: float,
+    xg_propio: float,
+    xg_rival: float,
+) -> float:
     ajuste = 0
-    
-    # Si perdiste pero merecías mucho más
+
     if puntos == 0 and xg_propio > (xg_rival + 0.5):
-        ajuste = 0.6  # Bono robusto por mala suerte
-    
-    # Si ganaste pero apenas tuviste oportunidades (suerte extrema)
+        ajuste = 0.6
     elif puntos == 3 and xg_propio < xg_rival - 0.7:
-        ajuste = -0.1  # Penalización muy suave
-    
-    # Si empataste siendo defensivamente sólido
+        ajuste = -0.1
     elif puntos == 1 and xg_propio < (xg_rival - 0.3):
-        ajuste = 0.2  # Bono defensivo
-    
+        ajuste = 0.2
+
     return puntos + ajuste
 
-def calcular_bonus_rival(id_rival, equipos_top6):
-    """Bonus por enfrentar rival difícil (top 6)."""
+
+def calcular_bonus_rival(id_rival: int, equipos_top6: list[int]) -> float:
     return BONUS_TOP6 if id_rival in equipos_top6 else 0
 
-def procesamiento_partido(partido, id_equipo, id_rival, stats_rival, equipos_top6):
-    """Procesa un partido individual para calcular puntuación."""
-    es_local = partido['id_local'] == id_equipo
-    
-    # Goles
-    goles_favor = partido['goles_local'] if es_local else partido['goles_visitante']
-    goles_contra = partido['goles_visitante'] if es_local else partido['goles_local']
-    
-    # Puntos base
+
+def procesar_partido(
+    partido: pd.Series,
+    id_equipo: int,
+    id_rival: int,
+    estadisticas_rival: pd.DataFrame,
+    equipos_top6: list[int],
+) -> float:
+    es_local = partido["id_local"] == id_equipo
+
+    goles_favor = partido["goles_local"] if es_local else partido["goles_visitante"]
+    goles_contra = partido["goles_visitante"] if es_local else partido["goles_local"]
+
     puntos = calcular_puntos_base(goles_favor, goles_contra)
-    
-    # Ajuste xG
-    if 'goles_esperados' in partido and not stats_rival.empty:
+
+    if "goles_esperados" in partido and not estadisticas_rival.empty:
         try:
-            xg_propio = float(partido['goles_esperados'])
-            xg_rival = float(stats_rival.iloc[0]['goles_esperados'])
+            xg_propio = float(partido["goles_esperados"])
+            xg_rival = float(estadisticas_rival.iloc[0]["goles_esperados"])
             puntos = aplicar_ajustes_xg(puntos, goles_favor, goles_contra, xg_propio, xg_rival)
         except (ValueError, KeyError):
-            pass  # Si falta xG, solo usamos resultado
-    
-    # Bonus rival
-    puntos += calcular_bonus_rival(id_rival, equipos_top6)
-    
-    return puntos
+            pass
 
-def calcular_forma_equipo(eq_id, df_2025, df_stats, df_partidos, equipos_top6):
-    """Calcula puntuación de forma para un equipo específico."""
-    
-    # Obtener nombre
-    equipo_info = df_2025[df_2025['id_equipo'] == eq_id]
+    return puntos + calcular_bonus_rival(id_rival, equipos_top6)
+
+
+def calcular_forma_equipo(
+    id_equipo: int,
+    equipos_temporada: pd.DataFrame,
+    estadisticas: pd.DataFrame,
+    partidos: pd.DataFrame,
+    equipos_top6: list[int],
+    temporada: int = TEMPORADA_TARGET,
+) -> dict | None:
+    equipo_info = equipos_temporada[equipos_temporada["id_equipo"] == id_equipo]
     if equipo_info.empty:
         return None
-    
-    nombre_equipo = equipo_info['nombre_equipo'].iloc[0]
-    
-    # Filtrar partidos de este equipo (SOLO TEMPORADA 2025)
-    mis_stats = df_stats[df_stats['id_equipo'] == eq_id]
-    mis_partidos = mis_stats.merge(df_partidos[df_partidos['temporada'] == TEMPORADA_TARGET], 
-                                    on='id_partido', how='inner')
-    
-    if mis_partidos.empty:
-        print(f"⚠️  {nombre_equipo}: Sin partidos en {TEMPORADA_TARGET}")
+
+    nombre_equipo = equipo_info["nombre_equipo"].iloc[0]
+    partidos_temporada = partidos[partidos["temporada"] == temporada].copy()
+    ids_partidos_temporada = set(partidos_temporada["id_partido"])
+    estadisticas_temporada = estadisticas[
+        estadisticas["id_partido"].isin(ids_partidos_temporada)
+    ].copy()
+    estadisticas_equipo = estadisticas_temporada[estadisticas_temporada["id_equipo"] == id_equipo]
+    partidos_equipo = estadisticas_equipo.merge(
+        partidos_temporada,
+        on="id_partido",
+        how="inner",
+    )
+
+    if partidos_equipo.empty:
+        print(f"{nombre_equipo}: sin partidos en {temporada}")
         return None
-    
-    # Últimos N partidos ordenados cronológicamente
-    ultimos_n = mis_partidos.sort_values(by='id_partido', ascending=False).head(NUM_PARTIDOS)
-    ultimos_n = ultimos_n.sort_values(by='id_partido', ascending=True)  # Cronológico para ponderación
-    
-    # Calcular puntos con ponderación temporal
+
+    ultimos_n = partidos_equipo.sort_values(by="id_partido", ascending=False).head(NUM_PARTIDOS)
+    ultimos_n = ultimos_n.sort_values(by="id_partido", ascending=True)
+
     puntos_ponderados = []
     pesos = []
-    
-    for idx, (_, partido) in enumerate(ultimos_n.iterrows()):
-        # Peso exponencial: partidos recientes pesan más
-        peso = PONDERACION_TEMPORAL ** (NUM_PARTIDOS - idx - 1)
+
+    for indice, (_, partido) in enumerate(ultimos_n.iterrows()):
+        peso = PONDERACION_TEMPORAL ** (NUM_PARTIDOS - indice - 1)
         pesos.append(peso)
-        
-        # Identificar rival
-        id_rival = partido['id_visitante'] if partido['id_local'] == eq_id else partido['id_local']
-        
-        # Obtener stats rival
-        stats_rival = df_stats[(df_stats['id_partido'] == partido['id_partido']) & 
-                               (df_stats['id_equipo'] != eq_id)]
-        
-        # Calcular puntuación del partido
-        puntos = procesamiento_partido(partido, eq_id, id_rival, stats_rival, equipos_top6)
+
+        id_rival = partido["id_visitante"] if partido["id_local"] == id_equipo else partido["id_local"]
+        estadisticas_rival = estadisticas_temporada[
+            (estadisticas_temporada["id_partido"] == partido["id_partido"])
+            & (estadisticas_temporada["id_equipo"] != id_equipo)
+        ]
+
+        puntos = procesar_partido(partido, id_equipo, id_rival, estadisticas_rival, equipos_top6)
         puntos_ponderados.append(puntos * peso)
-    
-    # Promedio ponderado
+
     nota_media = np.sum(puntos_ponderados) / np.sum(pesos)
-    
-    # Métricas adicionales
-    tendencia = ultimos_n['temporada'].iloc[-1] - ultimos_n['temporada'].iloc[0] if len(ultimos_n) > 1 else 0
     variabilidad = np.std(puntos_ponderados)
-    
-    # Normalización a escala 0-10 (más permisiva)
     nota_final = min(10, (nota_media / FACTOR_NORMALIZACION) * 10)
-    
-    # Determinar estado (umbrales más permisivos)
+
     if nota_final >= UMBRAL_POSITIVO:
-        estado = "🔥 Positivo"
+        estado = "Positivo"
     elif nota_final >= UMBRAL_CRITICO:
-        estado = "📊 Estable"
+        estado = "Estable"
     else:
-        estado = "❌ Crítico"
-    
+        estado = "Critico"
+
     return {
-        'id_equipo': eq_id,
-        'nombre_equipo': nombre_equipo,
-        'puntuacion_forma': round(nota_final, 2),
-        'estado': estado,
-        'tendencia': round(nota_media, 2),  # Score bruto sin normalizar
-        'variabilidad': round(variabilidad, 2)
+        "id_equipo": id_equipo,
+        "nombre_equipo": nombre_equipo,
+        "puntuacion_forma": round(nota_final, 2),
+        "estado": estado,
+        "tendencia": round(nota_media, 2),
+        "variabilidad": round(variabilidad, 2),
     }
 
-def main():
-    args = parse_args()
 
-    # Cargar datos
-    df_partidos, df_stats, df_clasificacion = cargar_datos(args)
-    
-    # Obtener equipos de temporada objetivo
-    df_2025, equipos_top6 = obtener_info_equipos_temporada(df_clasificacion, TEMPORADA_TARGET)
-    
-    if df_2025.empty:
-        print(f"❌ No hay datos disponibles para la temporada {TEMPORADA_TARGET}")
-        exit(1)
-    
-    lista_equipos_2025 = df_2025['id_equipo'].unique()
-    print(f"✅ Procesando {len(lista_equipos_2025)} equipos...")
-    
-    # Procesar cada equipo
-    resultados_forma = []
-    
-    for eq_id in lista_equipos_2025:
-        resultado = calcular_forma_equipo(eq_id, df_2025, df_stats, df_partidos, equipos_top6)
+def calcular_forma_temporada(
+    temporada: int,
+    partidos: pd.DataFrame,
+    estadisticas: pd.DataFrame,
+    clasificacion: pd.DataFrame,
+    incluir_temporada: bool = False,
+) -> pd.DataFrame:
+    equipos_temporada, equipos_top6 = obtener_info_equipos_temporada(clasificacion, temporada)
+    if equipos_temporada.empty:
+        return pd.DataFrame()
+
+    resultados = []
+    for id_equipo in equipos_temporada["id_equipo"].unique():
+        resultado = calcular_forma_equipo(
+            id_equipo,
+            equipos_temporada,
+            estadisticas,
+            partidos,
+            equipos_top6,
+            temporada,
+        )
         if resultado:
-            resultados_forma.append(resultado)
-    
-    # Crear DataFrame y exportar
-    df_export = pd.DataFrame(resultados_forma)
-    df_export = df_export.sort_values('puntuacion_forma', ascending=False)
-    
-    output_path = Path(args.output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    df_export.to_csv(output_path, index=False, sep=';')
-    
-    print(f"\n✅ ¡Análisis completado! {len(df_export)} equipos procesados")
-    print(f"📁 Exportado a: {output_path}\n")
-    print(df_export.to_string(index=False))
+            if incluir_temporada:
+                resultado = {"temporada": temporada, **resultado}
+            resultados.append(resultado)
+
+    if not resultados:
+        return pd.DataFrame()
+
+    columnas_orden = ["puntuacion_forma"]
+    ascending = [False]
+    if incluir_temporada:
+        columnas_orden = ["temporada", "puntuacion_forma"]
+        ascending = [True, False]
+
+    return pd.DataFrame(resultados).sort_values(columnas_orden, ascending=ascending)
+
+
+def obtener_temporadas_disponibles(clasificacion: pd.DataFrame) -> list[int]:
+    temporadas = pd.to_numeric(clasificacion["temporada"], errors="coerce").dropna()
+    return sorted(temporadas.astype(int).unique().tolist())
+
+
+def main() -> None:
+    argumentos = leer_argumentos()
+    partidos, estadisticas, clasificacion = cargar_datos(argumentos)
+
+    salida = calcular_forma_temporada(
+        TEMPORADA_TARGET,
+        partidos,
+        estadisticas,
+        clasificacion,
+    )
+    if salida.empty:
+        raise ValueError(f"No hay datos disponibles para la temporada {TEMPORADA_TARGET}")
+
+    archivo_salida = Path(argumentos.output)
+    archivo_salida.parent.mkdir(parents=True, exist_ok=True)
+    salida.to_csv(archivo_salida, index=False, sep=";")
+
+    print(f"Analisis completado. Equipos procesados: {len(salida)}")
+    print(f"Archivo generado: {archivo_salida}")
+    print(salida.to_string(index=False))
+
+    temporadas = obtener_temporadas_disponibles(clasificacion)
+    resultados_temporadas = [
+        calcular_forma_temporada(
+            temporada,
+            partidos,
+            estadisticas,
+            clasificacion,
+            incluir_temporada=True,
+        )
+        for temporada in temporadas
+    ]
+    resultados_temporadas = [
+        resultado for resultado in resultados_temporadas if not resultado.empty
+    ]
+
+    if resultados_temporadas:
+        salida_todas = pd.concat(resultados_temporadas, ignore_index=True)
+    else:
+        salida_todas = pd.DataFrame(
+            columns=[
+                "temporada",
+                "id_equipo",
+                "nombre_equipo",
+                "puntuacion_forma",
+                "estado",
+                "tendencia",
+                "variabilidad",
+            ]
+        )
+
+    archivo_salida_todas = Path(argumentos.output_todas)
+    archivo_salida_todas.parent.mkdir(parents=True, exist_ok=True)
+    salida_todas.to_csv(archivo_salida_todas, index=False, sep=";")
+    print(f"Archivo historico generado: {archivo_salida_todas}")
+
 
 if __name__ == "__main__":
     main()

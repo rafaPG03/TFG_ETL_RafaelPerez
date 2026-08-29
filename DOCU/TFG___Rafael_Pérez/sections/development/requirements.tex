@@ -1,0 +1,139 @@
+
+En este capítulo se presentan los objetivos y el catálogo de requisitos del nuevo sistema informático. 
+
+% \section{Objetivos de negocio}
+% El propósito de este sistema es transformar grandes volúmenes de datos históricos de la Liga Española (2015-2025) en conocimiento estratégico mediante una plataforma accesible. Los objetivos de negocio son:
+% \begin{itemize}
+%     \item Accesibilidad a datos históricos y scouting: Proporcionar una app que permita a aficionados y clubes realizar consultas complejas y análisis de rendimiento sin necesidad de conocimientos técnicas.
+%     \item Identificación de patrones de éxito: Facilitar el análisis comparativo para determinar qué variables estadísticas (posesión, precisión, recuperaciones) correlacionan más estrechamente con la obtención de puntos y el rendimiento a largo plazo.
+%     \item Monitorización de tendencias: Identificar de forma temprana cambios en el estado de forma de los equipos, permitiendo una toma de decisiones reactiva basada en datos actualizados jornada a jornada.
+%     \item Descubrimiento de talento mediante similitud: Implementar algoritmos que permitan identificar "jugadores espejo" o perfiles similares basándose en métricas de rendimiento objetivas, superando el análisis subjetivo tradicional.
+%     \item Seguimiento de la actualidad: Permitir al aficionado saber cuales son los últimos resultados de cada equipo y cuales serán los próximos que tendrá que jugar.
+    
+% \end{itemize}
+% \section{Objetivos del sistema}
+% Desde una perspectiva técnica, el sistema debe cumplir con los siguientes pilares:
+% \begin{itemize}
+%     \item Pipeline de datos robusto (ETL): Implementar un proceso de Extracción, Transformación y Carga automatizado en Python que gestione la ingesta multitemporada desde APIs externas, garantizando la limpieza y consistencia de los datos.
+%     \item Arquitectura de Inteligencia de Negocio: Diseñar un Data Warehouse optimizado para analítica (OLAP) que consolide estadísticas de equipos, jugadores y partidos de una década de competición.
+%     \item Motor de Analítica Avanzada: Desarrollar un módulo de Data Mining capaz de calcular índices de rendimiento (Scoring) y realizar agrupamientos (Clustering) de jugadores.
+%     \item Interfaz Multiplataforma: Desarrollar una aplicación móvil (Android/iOS y web) intuitiva que permita la visualización dinámica de las analíticas y la simulación jornada a jornada.
+% \end{itemize}
+\section{Requisitos del sistema}
+
+\subsection{Requisitos funcionales}
+
+Los requisitos funcionales describen las funcionalidades específicas o los servicios que el sistema debe ofrecer.
+
+\begin{itemize}
+
+    \item RF1. Autenticación y control de acceso: el sistema permitirá el acceso mediante credenciales únicas, validando la identidad del usuario contra la base de datos y gestionando el mantenimiento de la sesión activa mediante \textit{tokens} de seguridad.
+
+    \item RF2. Calendario y resultados de competición: el sistema ofrecerá una visualización cronológica de los partidos, permitiendo filtrar por jornada y mostrando el estado de los encuentros y sus resultados de forma actualizada.
+
+    \item RF3. Visualización de datos tabulares: el sistema presentará tablas detalladas de equipos, jugadores y temporadas que permitirán la ordenación y el filtrado por métricas específicas, integrando los datos descriptivos con los analíticos generados.
+
+    \item RF4. Análisis gráfico de rendimiento: el sistema generará representaciones visuales, como gráficos de radar para los perfiles de jugadores y gráficos de líneas para las tendencias, que faciliten la interpretación de los indicadores clave de rendimiento (\textit{KPI}).
+
+    \item RF5. Motor de predicción de resultados: el sistema proporcionará una estimación probabilística del resultado de futuros encuentros basándose en modelos estadísticos y en el estado de forma actual de los contendientes.
+
+    \item RF6. Identificación de jugadores similares: el sistema permitirá seleccionar un jugador y obtener una lista de perfiles similares basada en algoritmos de \textit{clustering}.
+
+    \item RF7. Adaptabilidad de la interfaz (modo oscuro): el sistema permitirá conmutar el esquema de colores de la interfaz entre el modo claro y el modo oscuro, mejorando la accesibilidad y la experiencia de usuario según las condiciones de luminosidad.
+
+    \item RF8. Gestión de preferencias y ajustes: el sistema ofrecerá un panel de configuración en el que el usuario podrá personalizar  los parámetros de visualización por defecto.
+
+    \item RF9. Gestión de la cuenta de usuario: el sistema permitirá al usuario modificar sus datos personales, actualizar la contraseña de acceso y ejercer su derecho de supresión de la cuenta y eliminación de sus datos.
+
+    \item RF10. Sistema de seguimiento de favoritos: el sistema permitirá marcar jugadores o equipos como favoritos para obtener acceso directo a sus estadísticas.
+
+    \item RF11. Comparador directo (\textit{Head-to-Head}): el sistema permitirá seleccionar dos entidades para realizar una comparación visual directa de sus métricas de rendimiento, facilitando el análisis de enfrentamientos.
+
+    \item RF12. Buscador global inteligente: el sistema integrará un motor de búsqueda que permita localizar rápidamente cualquier entidad, ya sea un jugador o un equipo, mediante el uso de texto predictivo.
+
+    \item RF13. Chatbot con IA: el sistema ofrecerá un chatbot con un motor de IA, por el cual el usuario podrá consultar información disponible en la base de datos de forma sencilla, intuitiva y rápida.
+    
+    \item RF14. Simulación manual: el sistema integrará un sistema de simulación manual de la temporada presente, permitiendo al usuario añadir sus resultados de cada partido y analizar como iría la clasificación y sus probabilidades según ellos.
+
+\end{itemize}
+
+
+\subsection{Requisitos no funcionales}
+
+Además de los requisitos funcionales, el sistema debe satisfacer una serie de requisitos no funcionales relacionados con la calidad del \textit{software}. Estos requisitos se han definido tomando como referencia el estándar ISO/IEC 25010 \cite{iso25010}, que establece las principales características de calidad de un sistema \textit{software}.
+
+\begin{itemize}
+
+    \item RNF1. Adecuación funcional: la aplicación deberá proporcionar al usuario todas las funcionalidades necesarias para realizar las distintas acciones que ofrece la aplicación, como la visualización de datos y estadísticas, la interacción con el chatbot y la consulta de información futbolística, entre otras.
+
+    \item RNF2. Eficiencia de desempeño: las consultas realizadas por el usuario deberán ofrecer tiempos de respuesta reducidos, optimizando el acceso a la base de datos y minimizando el consumo de recursos del dispositivo móvil y del servidor.
+
+    \item RNF3. Compatibilidad: el sistema deberá integrarse correctamente con las tecnologías empleadas, incluyendo PostgreSQL como sistema gestor de bases de datos, API Football como fuente de información, API Gemini para el chatbot inteligente y dispositivos Android mediante React Native y Expo.
+
+    \item RNF4. Usabilidad: la interfaz deberá ser intuitiva, sencilla y consistente, permitiendo que cualquier usuario pueda acceder a las distintas funcionalidades sin necesidad de conocimientos técnicos previos.
+
+    \item RNF5. Fiabilidad: la aplicación deberá garantizar un funcionamiento estable, gestionando adecuadamente los posibles errores de conexión, las respuestas inválidas de servicios externos o las consultas incorrectas realizadas por el usuario.
+
+    \item RNF6. Seguridad: el sistema deberá proteger la información de los usuarios mediante una autenticación segura, el almacenamiento de las contraseñas con funciones hash y el control del acceso a la información personal. Asimismo, el chatbot solo podrá consultar la información permitida de la base de datos, evitando operaciones de modificación o eliminación de datos.
+
+    \item RNF7. Mantenibilidad: el código deberá estar organizado de forma modular, separando claramente el \textit{frontend}, el \textit{backend}, el proceso ETL, los modelos de minería de datos y la base de datos, facilitando futuras ampliaciones y tareas de mantenimiento.
+
+    \item RNF8. Portabilidad: la aplicación deberá poder ejecutarse en distintos dispositivos Android compatibles con React Native. Además, el sistema deberá poder desplegarse fácilmente en diferentes equipos mediante contenedores Docker, reduciendo los problemas de configuración del entorno.
+
+\end{itemize}
+
+
+\subsection{Requisitos de información}
+
+La aplicación utiliza y gestiona distintos tipos de información, que pueden clasificarse según su función principal en cuatro categorías: datos deportivos, datos generados mediante minería de datos, datos utilizados por la aplicación y datos almacenados en la base de datos. A continuación, se detallan los requisitos de información asociados a cada tipo:
+
+\begin{itemize}
+
+    \item Datos deportivos:
+    \begin{itemize}
+        \item Equipos: información identificativa de los clubes, incluyendo nombre, estadio, ciudad, país, capacidad y año de fundación.
+
+        \item Jugadores: datos personales y deportivos, como nombre, nacionalidad, edad, posición y características físicas.
+
+        \item Partidos: información de cada encuentro disputado, incluyendo fecha, jornada, equipos participantes, resultado y estado del partido.
+
+        \item Estadísticas de equipos y jugadores: métricas obtenidas tanto por partido como por temporada, utilizadas para consultas, comparativas y visualizaciones.
+
+        \item Eventos de partido: goles, asistencias, tarjetas, sustituciones y demás sucesos ocurridos durante los encuentros.
+    \end{itemize}
+
+    \item Datos generados mediante minería de datos:
+    \begin{itemize}
+        \item Predicciones de partidos: probabilidades de victoria local, empate y victoria visitante generadas mediante modelos supervisados.
+
+        \item Simulación de competiciones: probabilidades de ser campeón, clasificarse para competiciones europeas o descender, obtenidas mediante simulaciones de Monte Carlo.
+
+        \item Estado de forma de equipos y jugadores: indicadores calculados a partir del rendimiento reciente.
+
+        \item Perfiles estadísticos y agrupaciones: resultados obtenidos mediante técnicas de \textit{clustering} y análisis estadístico para identificar jugadores similares y estilos de juego.
+
+        \item Recomendaciones de fichajes: información generada a partir de las necesidades de cada plantilla y de la similitud entre jugadores.
+    \end{itemize}
+
+    \item Datos utilizados por la aplicación:
+    \begin{itemize}
+        \item Consultas realizadas por el usuario: preguntas introducidas mediante el chatbot, utilizadas para generar consultas SQL y respuestas en lenguaje natural.
+
+        \item Parámetros de navegación y filtros: temporada, jornada, equipo o jugador seleccionado.
+
+        \item Estados de la interfaz: información de carga, errores, navegación entre pantallas y selección de elementos.
+    \end{itemize}
+
+    \item Datos almacenados en la base de datos:
+    \begin{itemize}
+        \item Cuentas de usuario: nombre de usuario, dirección de correo electrónico y contraseña almacenada mediante hash con \texttt{bcrypt}.
+
+        \item Favoritos del usuario: equipos y jugadores marcados como favoritos para facilitar su acceso desde la aplicación.
+
+        \item Tablas del \textit{data warehouse}: dimensiones, hechos y tablas derivadas de minería de datos que soportan todas las consultas analíticas de la aplicación.
+    \end{itemize}
+
+\end{itemize}
+
+Toda la información deportiva procede de API Football y, una vez procesada mediante el proceso ETL, se almacena en un \textit{data warehouse} implementado sobre PostgreSQL. Los datos personales de los usuarios se encuentran protegidos mediante autenticación basada en JSON Web \textit{Tokens} (JWT), mientras que las contraseñas se almacenan cifradas utilizando el algoritmo \texttt{bcrypt}. Además, el chatbot únicamente dispone de permisos de consulta sobre la base de datos, impidiendo cualquier operación de modificación o eliminación de la información.
+

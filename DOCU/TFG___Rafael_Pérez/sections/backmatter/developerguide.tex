@@ -1,0 +1,498 @@
+
+A continuación se recogen las instrucciones necesarias para evolucionar el \textit{software}. Este manual está dirigido a los desarrolladores que pretenden extender o modificar el código fuente, con el fin de incorporar nuevas funcionalidades o modificar las ya existentes.
+
+\section{Introducción}
+El presente proyecto consiste en una aplicación móvil multiplataforma orientada al análisis avanzado de estadísticas de fútbol, exactamente de LaLiga, mediante \textit{data mining} y algoritmos de \textit{machine learning}. La arquitectura sigue un modelo cliente-servidor y se divide en cuatro componentes principales:
+\begin{itemize}
+    \item Una aplicación móvil desarrollada con React Native y Expo, encargada de la presentación de la información y de la interacción con el usuario.
+    \item Una API REST desarrollada con Node.js y Express, responsable de procesar las peticiones, aplicar la lógica de negocio y acceder a los datos.
+    \item Una base de datos PostgreSQL organizada mediante tablas dimensionales, históricas y analíticas, en la que se almacena la información deportiva, los usuarios, los favoritos y los resultados de los procesos de \textit{data mining}.
+    \item Un conjunto de servicios de análisis e inteligencia artificial compuesto por un simulador Monte Carlo implementado en Python y un asistente conversacional basado en Gemini 2.5 Flash.
+\end{itemize}
+
+\section{Preparaci\'on del entorno de trabajo}
+
+La infraestructura del proyecto se ha contenerizado mediante Docker, evitando que
+el desarrollador tenga que instalar localmente PostgreSQL, Node.js, Python o sus
+dependencias. La arquitectura esta formada por tres contenedores comunicados
+mediante una red interna de Docker.
+
+\begin{table}[H]
+\centering
+\caption{Distribuci\'on de los servicios en contenedores.}
+\label{tab:contenedores}
+\begin{tabular}{|p{2.6cm}|p{8.2cm}|p{3cm}|}
+\hline
+\textbf{Contenedor} & \textbf{Contenido} & \textbf{Acceso} \\
+\hline
+\texttt{database} & PostgreSQL y volcado definitivo de la base de datos & Solo red interna \\
+\hline
+\texttt{backend} & Node.js, Express, Python y simulador Monte Carlo & Puerto 3000 \\
+\hline
+\texttt{frontend} & Expo y Metro Bundler & Puerto 8081 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+La aplicaci\'on Expo Go no se ejecuta dentro de Docker, sino en un dispositivo
+f\'isico. Esta se conecta al servidor Metro para descargar la aplicaci\'on
+y directamente al backend para realizar las peticiones HTTP. El recorrido de las
+comunicaciones es el siguiente:
+
+\begin{lstlisting}
+Expo Go ------------------> Metro Bundler :8081
+   |
+   +----------------------> Express :3000
+                                  |
+                                  +--> PostgreSQL :5432
+                                  |
+                                  +--> Python Monte Carlo
+\end{lstlisting}
+
+PostgreSQL no expondr\'a su puerto a la m\'aquina anfitriona, salvo que resulte
+necesario durante las tareas de administraci\'on. El backend acceder\'a a la base de
+datos mediante el nombre del servicio Docker, \texttt{database}, y el puerto
+interno 5432.
+
+Por su parte, los puertos 3000 y 8081 s\'i deber\'an publicarse, ya que Expo Go
+necesita acceder tanto al backend como al servidor Metro desde el exterior de la
+red Docker.
+
+Los requisitos principales de la m\'aquina anfitriona se recogen en la
+Tabla~\ref{tab:requisitos-host}.
+
+\begin{table}[H]
+\centering
+\caption{Requisitos de \textit{software} del entorno de desarrollo.}
+\label{tab:requisitos-host}
+\begin{tabular}{|p{3.4cm}|p{5cm}|p{4.6cm}|}
+\hline
+\textbf{Componente} & \textbf{Herramienta} & \textbf{Versi\'on m\'inima} \\
+\hline
+Contenedores & Docker Engine & 24.0 o superior \\
+\hline
+Orquestaci\'on & Docker Compose v2 & 2.20 o superior \\
+\hline
+Control de versiones & Git & 2.x \\
+\hline
+Cliente m\'ovil & Expo Go & Compatible con SDK 54 \\
+\hline
+\end{tabular}
+\end{table}
+
+Node.js, Python, PostgreSQL y las dependencias del proyecto no tendr\'an que
+instalarse directamente en el equipo anfitri\'on, ya que estar\'an incluidos en
+las im\'agenes Docker. Las versiones de los entornos utilizados dentro de los
+contenedores se recogen en la Tabla~\ref{tab:entornos-internos}.
+
+\begin{table}[H]
+\centering
+\caption{Entornos internos previstos para los contenedores.}
+\label{tab:entornos-internos}
+\begin{tabular}{|p{2.6cm}|p{10.7cm}|}
+\hline
+\textbf{Contenedor} & \textbf{Entorno interno} \\
+\hline
+\texttt{database} & PostgreSQL 18.1 \\
+\hline
+\texttt{backend} & Node.js 20.19.4 o superior y Python 3.10 o superior \\
+\hline
+\texttt{frontend} & Node.js 20.19.4 o superior, React Native 0.81.5 y Expo SDK 54 \\
+\hline
+\end{tabular}
+\end{table}
+
+El contenedor \texttt{backend} instalar\'a tanto las dependencias npm de Express
+como las dependencias Python del simulador: NumPy, pandas y psycopg2. Para ello,
+ser\'a necesario incorporar al proyecto un archivo \texttt{requirements.txt}.
+
+Las variables de entorno se distribuir\'an entre los servicios de la siguiente
+forma:
+
+\begin{itemize}
+  \item \texttt{frontend}: \texttt{EXPO\_PUBLIC\_API\_URL}.
+  \item \texttt{backend}: \texttt{DB\_USER}, \texttt{DB\_HOST},
+        \texttt{DB\_NAME}, \texttt{DB\_PASSWORD}, \texttt{DB\_PORT},
+        \texttt{GEMINI\_API\_KEY} y \texttt{MONTECARLO\_PYTHON\_PATH}.
+  \item \texttt{database}: nombre de la base de datos, usuario y contrase\~na de
+        PostgreSQL.
+\end{itemize}
+
+Dentro de la red Docker, el backend utilizar\'a \texttt{database} como valor de
+\texttt{DB\_HOST}. Sin embargo, \texttt{EXPO\_PUBLIC\_API\_URL} deber\'a contener
+la direcci\'on IP de la m\'aquina anfitriona y el puerto publicado del backend, ya
+que un dispositivo f\'isico no puede resolver los nombres internos de Docker. Por
+ejemplo:
+
+\begin{lstlisting}
+EXPO_PUBLIC_API_URL=http://192.168.1.100:3000/api
+\end{lstlisting}
+
+Una vez creados los archivos de contenerizaci\'on, la infraestructura completa se
+iniciar\'a desde la ra\'iz del repositorio mediante el siguiente comando:
+
+\begin{lstlisting}
+docker compose up --build
+\end{lstlisting}
+
+\section{Estructura del repositorio}
+
+El proyecto utiliza una estructura de monorepositorio en la que se almacenan
+conjuntamente la aplicaci\'on m\'ovil, la API REST, el acceso a la base de datos y
+el script de simulaci\'on. La estructura es la mostrada en la Figura~\ref{fig:estructura-repositorio}.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{0.92\textwidth}
+\begin{lstlisting}
+TFG_LaLiga/
+|
+|-- backend/
+|   |-- src/
+|   |   |-- config/
+|   |   |   |-- db.js
+|   |   |   |-- gemini.js
+|   |   |   `-- swagger.js
+|   |   |-- controllers/
+|   |   |-- prompts/
+|   |   |-- routes/
+|   |   |-- scripts/
+|   |   |   `-- simulacion_montecarlo_laliga.py
+|   |   |-- services/
+|   |   |-- utils/
+|   |   `-- app.js
+|   |-- Dockerfile
+|   |-- requirements.txt
+|   `-- package.json
+|
+|-- frontend/
+|   |-- src/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- context/
+|   |   |-- screens/
+|   |   `-- theme/
+|   |-- App.js
+|   `-- Dockerfile
+|
+|-- database/
+|   `-- init/
+|       `-- dump.sql
+|
+|-- index.js
+|-- app.json
+|-- babel.config.js
+|-- package.json
+|-- docker-compose.yml
+|-- .dockerignore
+|-- .env.example
+`-- .gitignore
+\end{lstlisting}
+  \end{minipage}
+  \caption{Estructura prevista del repositorio contenerizado.}
+  \label{fig:estructura-repositorio}
+\end{figure}
+
+El archivo \texttt{docker-compose.yml} definir\'a los tres servicios, la red
+interna, los puertos publicados, las variables de entorno, los vol\'umenes y las
+dependencias de arranque.
+
+El directorio \texttt{database/init/} contendr\'a el volcado SQL definitivo. Este
+archivo se ejecutar\'a autom\'aticamente durante la primera inicializaci\'on del
+contenedor PostgreSQL.
+
+El archivo \texttt{Dockerfile} del backend instalar\'a Node.js y Python en una
+misma imagen. Tambi\'en copiar\'a el c\'odigo del servidor, instalar\'a las
+dependencias npm y procesar\'a el archivo \texttt{requirements.txt}. De esta
+forma, Express podr\'a invocar el script de Monte Carlo directamente sin recurrir
+a otro servicio de red.
+
+El archivo \texttt{Dockerfile} del frontend instalar\'a las dependencias de Expo
+y ejecutar\'a Metro Bundler escuchando en el puerto 8081.
+
+Dentro del backend, el directorio \texttt{config/} contendr\'a la conexi\'on con
+PostgreSQL, la configuraci\'on del cliente de Gemini y la definici\'on de
+Swagger/OpenAPI. La carpeta \texttt{controllers/} implementar\'a la l\'ogica
+asociada a usuarios, temporadas, equipos, jugadores, partidos, favoritos,
+b\'usqueda, chatbot y \textit{data mining}. Las rutas de la API permanecer\'an agrupadas
+bajo el prefijo \texttt{/api}.
+
+En el frontend, \texttt{App.js} configurar\'a la navegaci\'on, restaurar\'a la
+sesi\'on almacenada y registrar\'a los proveedores globales. Las vistas completas
+se organizar\'an en \texttt{screens/}, mientras que \texttt{components/} reunir\'a
+los elementos reutilizables y los componentes especializados por dominio
+funcional.
+
+
+\section{Stack tecnol\'ogico}
+
+Las principales tecnolog\'ias utilizadas por el sistema se recogen en la tabla ~\ref{tab:stack-tecnologico}.
+\begin{table}[H]
+\centering
+\caption{Stack tecnológico del proyecto.}
+\label{tab:stack-tecnologico}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|>{\centering\arraybackslash}m{3.2cm}|p{4.2cm}|p{6cm}|}
+\hline
+\textbf{Capa} & \textbf{Tecnología} & \textbf{Propósito} \\
+\hline
+
+\multirow[c]{2}{3.2cm}{\centering Contenerización} 
+& Docker Engine & Aislamiento y ejecución de los servicios. \\ \cline{2-3}
+& Docker Compose & Configuración conjunta del frontend, backend y base de datos. \\
+\hline
+
+\multirow[c]{4}{3.2cm}{\centering Cliente} 
+& React 19.1 & Construcción declarativa de la interfaz. \\ \cline{2-3}
+& React Native 0.81.5 & Desarrollo de la aplicación móvil multiplataforma. \\ \cline{2-3}
+& Expo SDK 54 & Entorno de desarrollo y ejecución mediante Expo Go. \\ \cline{2-3}
+& Metro Bundler & Empaquetado y distribución del código JavaScript. \\
+\hline
+
+\multirow[c]{3}{3.2cm}{\centering Servidor} 
+& Node.js & Entorno de ejecución del backend. \\ \cline{2-3}
+& Express 5.2.1 & Implementación de la API REST. \\ \cline{2-3}
+& dotenv y CORS & Gestión de variables de entorno y comunicación entre cliente y servidor. \\ \cline{2-3}
+& Swagger y OpenAPI 3.0 & Documentación y prueba interactiva de los endpoints. \\ \cline{2-3}
+& PostgreSQL 18.1 & Almacenamiento de datos deportivos, usuarios y resultados analíticos. \\
+\hline
+
+\multirow[c]{2}{3.2cm}{\centering Analítica} 
+& Python 3.10, NumPy y pandas & Procesamiento de datos, generación de métricas y simulaciones. \\ \cline{2-3}
+& psycopg2 & Comunicación entre los procesos Python y PostgreSQL. \\
+\hline
+
+\end{tabular}
+\end{table}
+\section{Instrucciones para la construcci\'on y puesta en marcha}
+
+Una vez implementada la contenerizaci\'on descrita en los apartados anteriores,
+la construcci\'on y puesta en marcha del sistema se realizar\'a de forma conjunta
+mediante Docker Compose. El desarrollador solamente necesitar\'a tener instalados
+Docker, Docker Compose, Git y Expo Go, ya que Node.js, PostgreSQL, Python y sus
+dependencias se ejecutar\'an dentro de los contenedores correspondientes.
+
+El primer paso consiste en obtener el c\'odigo fuente y acceder al directorio ra\'iz
+del proyecto:
+
+\begin{lstlisting}
+git clone https://github.com/rafaPG03/TFG_LaLiga.git
+cd TFG_LaLiga
+\end{lstlisting}
+
+\subsection{Configuraci\'on de las variables de entorno}
+
+Antes de construir las im\'agenes se deber\'a crear el archivo de configuraci\'on
+a partir de la plantilla incluida en el repositorio. En Linux o macOS se utilizar\'a
+el siguiente comando:
+
+\begin{lstlisting}
+cp .env.example .env
+\end{lstlisting}
+
+En Windows se podr\'a realizar la misma operaci\'on desde PowerShell:
+
+\begin{lstlisting}
+Copy-Item .env.example .env
+\end{lstlisting}
+
+El archivo \texttt{.env} ser\'a utilizado por Docker Compose para proporcionar la
+configuraci\'on necesaria a los tres servicios. Las variables previstas se describen
+en la Tabla~\ref{tab:variables-entorno-construccion}.
+
+\begin{table}[H]
+\centering
+\caption{Variables de entorno para la construcci\'on y ejecuci\'on del sistema.}
+\label{tab:variables-entorno-construccion}
+\begin{tabular}{|l|p{8.2cm}|}
+\hline
+\textbf{Variable} & \textbf{Descripci\'on} \\
+\hline
+\texttt{POSTGRES\_DB} & Nombre de la base de datos que crear\'a PostgreSQL. \\
+\hline
+\texttt{POSTGRES\_USER} & Usuario administrador de PostgreSQL. \\
+\hline
+\texttt{POSTGRES\_PASSWORD} & Contrase\~na del usuario de PostgreSQL. \\
+\hline
+\texttt{DB\_HOST} & Nombre del servicio de base de datos dentro de Docker; su valor ser\'a \texttt{database}. \\
+\hline
+\texttt{DB\_PORT} & Puerto interno de PostgreSQL; por defecto, 5432. \\
+\hline
+\texttt{DB\_NAME} & Nombre de la base de datos utilizada por Express. \\
+\hline
+\texttt{DB\_USER} & Usuario empleado por el backend para acceder a PostgreSQL. \\
+\hline
+\texttt{DB\_PASSWORD} & Contrase\~na utilizada por el backend para acceder a PostgreSQL. \\
+\hline
+\texttt{PORT} & Puerto de escucha de la API Express; por defecto, 3000. \\
+\hline
+\texttt{GEMINI\_API\_KEY} & Clave de acceso al servicio Gemini utilizado por el asistente. \\
+\hline
+\texttt{MONTECARLO\_PYTHON\_PATH} & Ruta del ejecutable de Python dentro del contenedor del backend. \\
+\hline
+\texttt{EXPO\_PUBLIC\_API\_URL} & Direcci\'on de la API accesible desde el dispositivo m\'ovil. \\
+\hline
+\texttt{REACT\_NATIVE\_PACKAGER\_HOSTNAME} & Direcci\'on IPv4 de la m\'aquina anfitriona anunciada por Expo. \\
+\hline
+\end{tabular}
+\end{table}
+
+Las variables \texttt{POSTGRES\_DB}, \texttt{DB\_NAME},
+\texttt{POSTGRES\_USER} y \texttt{DB\_USER} deber\'an mantener valores
+coherentes. Lo mismo se aplica a \texttt{POSTGRES\_PASSWORD} y
+\texttt{DB\_PASSWORD}, ya que el backend utilizar\'a esas credenciales para
+conectarse a la base de datos creada por el contenedor.
+
+Para utilizar Expo Go en un dispositivo f\'isico ser\'a necesario obtener la
+direcci\'on IPv4 local de la m\'aquina anfitriona. En Windows puede consultarse
+mediante \texttt{ipconfig}, mientras que en Linux o macOS puede utilizarse
+\texttt{ip addr} o \texttt{ifconfig}. Si, por ejemplo, la direcci\'on obtenida es
+\texttt{192.168.1.42}, la configuraci\'on incluir\'a los siguientes valores:
+
+\begin{lstlisting}
+DB_HOST=database
+DB_PORT=5432
+PORT=3000
+MONTECARLO_PYTHON_PATH=python
+EXPO_PUBLIC_API_URL=http://192.168.1.42:3000/api
+REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.42
+\end{lstlisting}
+
+No se deber\'a utilizar \texttt{localhost} en
+\texttt{EXPO\_PUBLIC\_API\_URL} cuando la aplicaci\'on se ejecute en un tel\'efono
+f\'isico, ya que en ese caso \texttt{localhost} har\'ia referencia al propio
+dispositivo y no al equipo que ejecuta Docker.
+
+\subsection{Construcci\'on de las im\'agenes y arranque de los servicios}
+
+Una vez configuradas las variables de entorno, la infraestructura completa se
+construir\'a y ejecutar\'a desde el directorio ra\'iz mediante:
+
+\begin{lstlisting}
+docker compose up --build
+\end{lstlisting}
+
+Este comando construir\'a las im\'agenes del frontend y del backend, descargar\'a
+la imagen de PostgreSQL, instalar\'a las dependencias npm y Python, crear\'a la red
+interna y pondr\'a en marcha los tres contenedores. Al ejecutarse en primer plano,
+la terminal mostrar\'a los registros de todos los servicios.
+
+Para ejecutar la infraestructura en segundo plano se utilizar\'a la opci\'on
+\texttt{-d}:
+
+\begin{lstlisting}
+docker compose up --build -d
+\end{lstlisting}
+
+El estado de los contenedores y sus registros podr\'an consultarse mediante:
+
+\begin{lstlisting}
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f database
+\end{lstlisting}
+
+\subsection{Inicializaci\'on de PostgreSQL mediante el volcado}
+
+La base de datos no requiere descargar conjuntos de datos externos ni ejecutar
+scripts adicionales de extracci\'on. Toda la informaci\'on necesaria se encontrar\'a
+en el volcado definitivo \texttt{database/init/dump.sql}.
+
+El archivo \texttt{docker-compose.yml} montar\'a este volcado en el directorio
+\texttt{/docker-entrypoint-initdb.d/} de la imagen oficial de PostgreSQL. De esta
+forma, el esquema, las tablas y los datos se importar\'an autom\'aticamente la
+primera vez que se cree el volumen de la base de datos. La importaci\'on inicial
+puede comprobarse consultando los registros del servicio:
+
+\begin{lstlisting}
+docker compose logs -f database
+\end{lstlisting}
+
+Los archivos del directorio de inicializaci\'on solo se ejecutan cuando PostgreSQL
+crea un directorio de datos vac\'io. Por tanto, si el contenedor ya dispone de un
+volumen inicializado y se necesita cargar de nuevo el volcado, este podr\'a
+importarse manualmente sin instalar PostgreSQL en la m\'aquina anfitriona:
+
+\begin{lstlisting}
+docker cp database/init/dump.sql database:/tmp/dump.sql
+docker exec -it database psql -U <usuario> -d <base_de_datos> -f /tmp/dump.sql
+\end{lstlisting}
+
+En el segundo comando, \texttt{<usuario>} y \texttt{<base\_de\_datos>} deber\'an
+sustituirse por los valores definidos en \texttt{POSTGRES\_USER} y
+\texttt{POSTGRES\_DB}. Antes de repetir una importaci\'on sobre una base de datos
+existente se deber\'a comprobar que no provoque duplicados o conflictos con los
+objetos creados previamente.
+
+\subsection{Puesta en marcha del backend}
+
+El backend se iniciar\'a autom\'aticamente como parte de Docker Compose y quedar\'a
+publicado en el puerto 3000 de la m\'aquina anfitriona. Express se conectar\'a al
+servicio \texttt{database} a trav\'es de la red interna de Docker.
+
+El entorno de Python tambi\'en formar\'a parte de este contenedor. Cuando el usuario
+solicite una simulaci\'on manual, Express ejecutar\'a directamente el script
+\texttt{simulacion\_montecarlo\_laliga.py} y recibir\'a su resultado en formato
+JSON. No ser\'a necesario iniciar un servicio Python independiente.
+
+Tras el arranque, la API y su documentaci\'on quedar\'an disponibles en las
+direcciones indicadas en la Tabla~\ref{tab:servicios-expuestos}.
+
+\begin{table}[H]
+\centering
+\caption{Servicios y direcciones del entorno local.}
+\label{tab:servicios-expuestos}
+\begin{tabular}{|p{3.4cm}|l|p{4cm}|}
+\hline
+\textbf{Servicio} & \textbf{Direcci\'on} & \textbf{Funci\'on} \\
+\hline
+API REST & \texttt{http://localhost:3000/api} & Endpoints de la aplicaci\'on. \\
+\hline
+Documentaci\'on & \texttt{http://localhost:3000/api-docs} & Interfaz Swagger UI. \\
+\hline
+Metro Bundler & \texttt{http://<IP\_LOCAL>:8081} & Distribuci\'on de la aplicaci\'on Expo. \\
+\hline
+PostgreSQL & \texttt{database:5432} & Acceso exclusivo desde la red interna. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Puesta en marcha del frontend}
+
+El frontend tambi\'en se ejecutar\'a dentro de Docker, por lo que no ser\'a
+necesario ejecutar \texttt{npm install} ni \texttt{npx expo start} directamente
+en la m\'aquina anfitriona. El contenedor instalar\'a las dependencias y arrancar\'a
+Expo con Metro Bundler en modo LAN y en el puerto 8081.
+
+El c\'odigo QR generado por Expo podr\'a consultarse en los registros del
+contenedor:
+
+\begin{lstlisting}
+docker compose logs -f frontend
+\end{lstlisting}
+
+Para abrir la aplicaci\'on se deber\'a iniciar Expo Go en el dispositivo m\'ovil y
+escanear el c\'odigo QR. El tel\'efono y la m\'aquina anfitriona deber\'an estar
+conectados a la misma red local, y el cortafuegos del sistema deber\'a permitir las
+conexiones entrantes a los puertos 3000 y 8081.
+
+Una vez cargado el c\'odigo JavaScript desde Metro, la aplicaci\'on se comunicar\'a
+con Express mediante la direcci\'on definida en
+\texttt{EXPO\_PUBLIC\_API\_URL}. El backend consultar\'a PostgreSQL y ejecutar\'a
+el proceso Python cuando corresponda.
+
+\subsection{Detenci\'on de la infraestructura}
+
+Para detener los contenedores conservando el volumen y los datos de PostgreSQL se
+utilizar\'a el siguiente comando:
+
+\begin{lstlisting}
+docker compose down
+\end{lstlisting}
+
+En el siguiente arranque, PostgreSQL reutilizar\'a el volumen existente y no
+volver\'a a importar el volcado. La eliminaci\'on del volumen solo deber\'a
+realizarse cuando se quiera reconstruir completamente la base de datos, puesto
+que implica borrar de forma permanente los datos almacenados en el entorno local.

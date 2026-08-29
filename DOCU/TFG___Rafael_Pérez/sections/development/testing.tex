@@ -1,0 +1,324 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+En este capítulo se presenta el plan de pruebas del sistema de información, incluyendo los diferentes tipos de pruebas que se han llevado a cabo, ya sean manuales (mediante listas de comprobación) o automatizadas mediante algún \textit{software} específico de pruebas.
+
+\section{Estrategia}
+
+La validación se realizó de forma incremental mediante pruebas unitarias, de
+integración y de sistema. Se comprobaron las funcionalidades principales y la
+comunicación entre el \textit{frontend}, el \textit{backend}, la base de datos y
+los servicios externos. Las tablas recogen los casos más representativos, que se
+consideraron superados cuando el resultado obtenido coincidió con el esperado.
+
+Tras cada corrección se repitió la prueba afectada y los flujos principales de
+acceso, consulta y gestión de datos, con el fin de detectar posibles regresiones.
+Las pruebas fueron ejecutadas por el autor en un entorno local, utilizando
+Docker para el \textit{backend} y PostgreSQL, y Expo Go en un dispositivo Android
+para la aplicación móvil.
+
+\section{Pruebas Unitarias}
+
+Las pruebas unitarias tienen por objetivo localizar errores en cada nuevo artefacto \textit{software} desarrollado, antes de que se produzca la integración con el resto de artefactos del sistema.
+
+En este proyecto, las pruebas unitarias se han centrado principalmente en aquellos módulos que contienen lógica propia de la aplicación, como la autenticación de usuarios, la validación de datos, la gestión de favoritos, el tratamiento de respuestas del backend y determinadas funciones auxiliares utilizadas por la interfaz. No se han considerado dentro de este apartado los procesos internos de extracción o generación de resultados analíticos, ya que el plan de pruebas se orienta principalmente a la validación de la aplicación final.
+
+Las pruebas se han realizado de forma manual y mediante comprobaciones controladas sobre funciones concretas, verificando que cada módulo devuelve el resultado esperado ante entradas válidas, entradas incorrectas y situaciones límite.
+
+\begin{table}[H]
+\centering
+\caption{Pruebas unitarias realizadas}
+\label{tab:pruebas_unitarias}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|p{3cm}|p{5cm}|p{4cm}|}
+\hline
+\textbf{Código} & \textbf{Módulo} & \textbf{Prueba realizada} & \textbf{Resultado esperado} \\ \hline
+
+PU-01 & Autenticación & Iniciar sesión con credenciales válidas. & El sistema devuelve los datos del usuario y permite acceder a la aplicación. \\ \hline
+
+PU-02 & Autenticación & Iniciar sesión con una contraseña incorrecta. & El sistema rechaza el acceso y muestra un mensaje de error. \\ \hline
+
+PU-03 & Registro & Crear una cuenta con datos válidos. & La cuenta se registra correctamente. \\ \hline
+
+PU-04 & Registro & Crear una cuenta con un correo ya existente. & El sistema informa de que el correo ya está registrado. \\ \hline
+
+PU-05 & Validación de formularios & Enviar formularios con campos obligatorios vacíos. & El sistema solicita completar los campos necesarios. \\ \hline
+
+PU-06 & Favoritos & Añadir un equipo o jugador a favoritos. & El elemento queda marcado como favorito. \\ \hline
+
+PU-07 & Favoritos & Eliminar un equipo o jugador de favoritos. & El elemento deja de aparecer como favorito. \\ \hline
+
+PU-08 & Buscador & Introducir un texto parcial de búsqueda. & El sistema devuelve coincidencias relacionadas con equipos o jugadores. \\ \hline
+
+PU-09 & Chatbot & Enviar una pregunta vacía. & La consulta no se envía y se mantiene la interfaz sin cambios. \\ \hline
+
+PU-10 & Chatbot & Enviar una consulta fuera del dominio futbolístico. & El asistente informa de que no puede responder de forma fiable. \\ \hline
+
+PU-11 & Gestión de sesión & Cerrar sesión desde la aplicación. & Se eliminan los datos locales de sesión y se vuelve a la pantalla de inicio. \\ \hline
+
+PU-12 & Tratamiento de errores & Simular una respuesta incorrecta del backend. & La pantalla muestra un mensaje de error adecuado. \\ \hline
+
+\end{tabular}
+\end{table}
+
+Estas pruebas permitieron comprobar el comportamiento básico de los módulos principales antes de validar su funcionamiento conjunto mediante las pruebas de integración. En aquellos casos en los que se detectaron errores, se corrigieron antes de continuar con la integración de las pantallas y servicios afectados.
+
+\section{Pruebas de integración}
+
+Las pruebas de integración permiten comprobar que los distintos componentes del
+sistema se comunican correctamente. A diferencia de las pruebas unitarias, estas
+pruebas no analizan cada módulo de manera aislada, sino el intercambio de
+información entre ellos.
+
+Para realizar las pruebas se utilizó un conjunto de datos conocido previamente.
+Cada caso de prueba contiene una acción, un resultado esperado, el resultado
+obtenido y una evidencia de su ejecución. Se probaron tanto situaciones correctas
+como algunos errores representativos.
+
+\subsection{\textit{Backend} -- Base de datos}
+
+Estas pruebas comprueban que el \textit{backend} puede conectarse a PostgreSQL,
+consultar la información almacenada y realizar correctamente las operaciones de
+persistencia necesarias.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|l|X|X|c|}
+        \hline
+        \textbf{ID} & \textbf{Prueba} & \textbf{Resultado esperado} &
+        \textbf{Estado} \\ \hline
+
+        PI-BD-01 &
+        Solicitar mediante un \textit{endpoint} la información de un equipo,
+        jugador o partido existente. &
+        El servidor devuelve un código HTTP 200 y los datos coinciden con los
+        almacenados en PostgreSQL. &
+        Superada \\ \hline
+
+        PI-BD-02 &
+        Realizar una operación de almacenamiento disponible en la aplicación,
+        como registrar un usuario o guardar una preferencia. &
+        La operación devuelve una respuesta satisfactoria y el nuevo registro
+        aparece correctamente en la base de datos. &
+        Superada \\ \hline
+
+        PI-BD-03 &
+        Solicitar un recurso cuyo identificador no existe. &
+        El servidor devuelve un código de error controlado, como HTTP 404, sin
+        producir cambios en la base de datos. &
+        Superada \\ \hline
+    \end{tabularx}
+    \caption{Pruebas de integración entre el \textit{backend} y la base de datos}
+    \label{tab:pruebas-backend-bd}
+\end{table}
+
+La primera prueba puede verificarse comparando la respuesta obtenida mediante
+Postman con el resultado de una consulta SQL ejecutada directamente sobre la
+base de datos. En las operaciones de escritura, se comprueba también que el
+registro haya sido almacenado y que no se hayan modificado otros datos.
+
+% Insertar aquí una captura de Postman y, si se considera necesario,
+% otra captura con la consulta realizada en PostgreSQL.
+\subsection{\textit{Frontend} -- \textit{Backend}}
+
+El objetivo de estas pruebas es comprobar que la aplicación móvil envía
+correctamente las peticiones al \textit{backend}, interpreta sus respuestas y
+muestra al usuario la información recibida.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|l|X|X|c|}
+        \hline
+        \textbf{ID} & \textbf{Prueba} & \textbf{Resultado esperado} &
+        \textbf{Estado} \\ \hline
+
+        PI-FB-01 &
+        Acceder desde la aplicación a una pantalla que muestre equipos,
+        jugadores, partidos o estadísticas. &
+        El \textit{frontend} realiza la petición y muestra los mismos datos que
+        devuelve el \textit{backend}. &
+        Superada \\ \hline
+
+        PI-FB-02 &
+        Enviar un formulario desde la aplicación, como el inicio de sesión o el
+        registro de un usuario. &
+        Los datos llegan al servidor y la aplicación procesa correctamente la
+        respuesta recibida. &
+        Superada \\ \hline
+
+        PI-FB-03 &
+        Introducir datos incorrectos en un formulario o provocar una respuesta
+        de error del servidor. &
+        La aplicación no se bloquea y muestra al usuario un mensaje de error
+        comprensible. &
+        Superada \\ \hline
+
+        PI-FB-04 &
+        Intentar realizar una consulta con el \textit{backend} detenido o sin
+        conexión de red. &
+        La aplicación controla el fallo de conexión y permite volver a intentar
+        la operación. &
+        Superada \\ \hline
+    \end{tabularx}
+    \caption{Pruebas de integración entre el \textit{frontend} y el
+    \textit{backend}}
+    \label{tab:pruebas-frontend-backend}
+\end{table}
+
+Para verificar estas pruebas se comparan los datos mostrados en la interfaz con
+la respuesta del \textit{endpoint} correspondiente. Como evidencia se pueden
+incluir capturas de la aplicación y de la respuesta obtenida mediante Postman.
+
+\subsection{Chatbot -- \textit{Backend} -- Base de datos}
+
+Estas pruebas validan el flujo completo de una consulta realizada al
+chatbot. El mensaje introducido por el usuario debe enviarse al
+\textit{backend}, procesarse y generar una consulta de lectura sobre la base de
+datos. Finalmente, la respuesta debe regresar hasta la interfaz de la aplicación.
+
+Debido a que el modelo puede generar respuestas con redacciones diferentes, no
+se compara el texto de forma literal. La validación se realiza comprobando que
+los datos relevantes de la respuesta coincidan con los almacenados en la base
+de datos.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|l|X|X|c|}
+        \hline
+        \textbf{ID} & \textbf{Prueba} & \textbf{Resultado esperado} &
+        \textbf{Estado} \\ \hline
+
+        PI-CB-01 &
+        Formular una pregunta sobre un dato conocido, como la clasificación de
+        un equipo o los goles marcados por un jugador en una temporada. &
+        El chatbot devuelve una respuesta cuyo dato principal coincide
+        con la información almacenada en PostgreSQL. &
+        Superada \\ \hline
+
+        PI-CB-02 &
+        Realizar una consulta sobre información inexistente o que no se
+        encuentre almacenada. &
+        El sistema informa de que no dispone de la información y no genera un
+        dato como si fuera verdadero. &
+        Superada \\ \hline
+
+        PI-CB-03 &
+        Introducir una petición que intente modificar o eliminar información de
+        la base de datos. &
+        La operación es rechazada y la base de datos permanece sin cambios. &
+        Superada \\ \hline
+
+        PI-CB-04 &
+        Enviar una pregunta vacía, incompleta o no relacionada con la información
+        que puede consultar el sistema. &
+        El sistema controla la entrada y devuelve un mensaje adecuado sin
+        producir un error interno. &
+        Superada \\ \hline
+    \end{tabularx}
+    \caption{Pruebas de integración del chatbot}
+    \label{tab:pruebas-chatbot}
+\end{table}
+
+Para comprobar la exactitud de la primera prueba, se consulta directamente la
+base de datos y se compara el resultado con la información proporcionada por el
+chatbot. En la prueba de seguridad se registra el estado de la base de
+datos antes y después de la petición, verificando que no se haya producido
+ninguna modificación.
+\section{Pruebas de Sistema}
+En esta actividad se realizan las pruebas de sistema de modo que se asegure que el sistema cumple con todos los requisitos establecidos: funcionales, de almacenamiento, reglas de negocio y no funcionales. Se suelen desarrollar en un entorno específico para pruebas.
+
+\subsection{Pruebas funcionales}
+
+Las pruebas funcionales verifican de extremo a extremo los principales casos de
+uso del sistema. Para evitar repeticiones, se agrupan las operaciones que forman
+parte de un mismo flujo.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|l|p{3cm}|X|c|}
+        \hline
+        \textbf{ID} & \textbf{Funcionalidad} & \textbf{Comprobación} &
+        \textbf{Estado} \\ \hline
+
+        PF-01 & Acceso a la aplicación &
+        Registrar una cuenta, iniciar sesión con ella y cerrar la sesión. &
+        Superada \\ \hline
+
+        PF-02 & Consulta deportiva &
+        Consultar temporadas, equipos, jugadores y partidos mediante listados,
+        filtros y pantallas de detalle. &
+        Superada \\ \hline
+
+        PF-03 & Favoritos &
+        Añadir y eliminar equipos o jugadores de la selección personal. &
+        Superada \\ \hline
+
+        PF-04 & Análisis avanzados &
+        Seleccionar una temporada y consultar los análisis de favoritos,
+        equipos, jugadores y predicciones. &
+        Superada \\ \hline
+
+        PF-05 & Chatbot &
+        Realizar una consulta futbolística y comprobar que la respuesta utiliza
+        los datos disponibles en el sistema. &
+        Superada \\ \hline
+
+        PF-06 & Simulador &
+        Introducir resultados, recalcular la clasificación y consultar las
+        probabilidades obtenidas mediante simulación. &
+        Superada \\ \hline
+
+        PF-07 & Gestión del perfil &
+        Consultar y modificar el perfil, y cambiar la contraseña verificando la
+        actual. &
+        Superada \\ \hline
+
+        PF-08 & Eliminación de cuenta &
+        Confirmar la eliminación y comprobar que las credenciales dejan de
+        permitir el acceso. &
+        Superada \\ \hline
+    \end{tabularx}
+    \caption{Pruebas funcionales del sistema}
+    \label{tab:pruebas-funcionales}
+\end{table}
+
+Todas las pruebas finalizaron con el resultado esperado, incluidos los mensajes
+mostrados ante datos incorrectos o incompletos.
+
+\subsection{Pruebas no funcionales}
+
+Las pruebas no funcionales tienen como objetivo evaluar el comportamiento general del sistema en relación con los atributos de calidad definidos en los requisitos no funcionales. Para ello, se comprueban aspectos como el rendimiento, la compatibilidad, la usabilidad, la fiabilidad, la seguridad, la mantenibilidad y la portabilidad de la aplicación.
+
+A continuación, se describen las pruebas planteadas para validar cada uno de estos requisitos:
+
+\begin{itemize}
+
+    \item PNF1. Adecuación funcional (RNF1): se comprueba que las funcionalidades disponibles cubren las necesidades principales del usuario. Para ello, se recorren los distintos módulos de la aplicación, verificando el acceso a los datos y estadísticas futbolísticas, la consulta de información, la interacción con el chatbot y la gestión de las funcionalidades asociadas al usuario. La prueba se considera satisfactoria si todas las acciones previstas pueden completarse correctamente.
+
+    \item PNF2. Eficiencia de desempeño (RNF2): se miden los tiempos de respuesta de las principales operaciones del sistema, como la carga de estadísticas, la consulta de información almacenada en PostgreSQL y la generación de respuestas por parte del chatbot. Las consultas se ejecutan varias veces en condiciones normales de uso para comprobar que los tiempos se mantienen estables y que la interfaz no queda bloqueada durante su procesamiento.
+
+    \item PNF3. Compatibilidad (RNF3): se verifica la comunicación entre los distintos componentes tecnológicos del sistema. Esto incluye la conexión del \textit{backend} con PostgreSQL, la obtención de información desde API Football, la comunicación con la API de Gemini y el intercambio de datos entre el \textit{frontend} desarrollado con React Native y el servidor. La prueba se supera cuando los componentes intercambian información correctamente y los datos recibidos pueden ser procesados por la aplicación.
+
+    \item PNF4. Usabilidad (RNF4): se realizan recorridos por las principales pantallas de la aplicación, comprobando que los elementos de navegación sean visibles, que los textos y botones resulten comprensibles y que exista coherencia visual entre las distintas vistas. También se comprueba que las acciones habituales puedan realizarse sin conocimientos técnicos ni instrucciones adicionales.
+
+    \item PNF5. Fiabilidad (RNF5): se simulan situaciones de error, como la pérdida de conexión con el servidor, la indisponibilidad temporal de un servicio externo, la recepción de respuestas inválidas o la introducción de consultas incorrectas. El sistema debe controlar estas situaciones sin cerrarse inesperadamente y mostrar al usuario un mensaje de error comprensible, permitiéndole continuar utilizando la aplicación o volver a intentar la operación.
+
+    \item PNF6. Seguridad (RNF6): se comprueba que un usuario no autenticado no pueda acceder a información personal ni a funcionalidades restringidas. Asimismo, se verifica que las contraseñas no se almacenen en texto plano y que las credenciales incorrectas sean rechazadas. En el caso del chatbot, se realizan consultas que intentan modificar o eliminar información de la base de datos, comprobando que únicamente se permitan operaciones de lectura autorizadas.
+
+    \item PNF7. Mantenibilidad (RNF7): se revisa la estructura del proyecto para comprobar que existe una separación clara entre el \textit{frontend}, el \textit{backend}, el proceso ETL, los modelos de minería de datos y la base de datos. También se verifica que los componentes presenten responsabilidades diferenciadas y puedan modificarse sin afectar innecesariamente al resto del sistema.
+
+    \item PNF8. Portabilidad (RNF8): se ejecuta la aplicación en diferentes dispositivos o emuladores Android compatibles con React Native y Expo, comprobando que las pantallas se adapten a distintas resoluciones. Además, se realiza el despliegue del sistema mediante Docker en un entorno limpio, verificando que los servicios puedan iniciarse a partir de la configuración proporcionada sin requerir modificaciones específicas en el código.
+
+\end{itemize}
+
+La superación de estas pruebas permite comprobar que el sistema no solo implementa las funcionalidades previstas, sino que también presenta un comportamiento adecuado en términos de calidad, rendimiento, seguridad y facilidad de mantenimiento. De esta forma, se valida el cumplimiento de los requisitos no funcionales definidos conforme a las características establecidas por el estándar ISO/IEC 25010.
