@@ -2,7 +2,6 @@ import json
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA" 
 CARPETA_PARTIDOS_JUGADORES = os.path.join(RUTA_BASE, "jugadores_partido")
@@ -33,18 +32,14 @@ def procesar_jugadores_partido():
         with open(ruta_completa, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
-            # Recorremos cada partido en el JSON
             for game in data:
                 fixture_id = game.get("fixture_id")
                 
-                # Recorremos los dos equipos del partido
                 for team_entry in game.get("players", []):
                     id_equipo = team_entry.get("team", {}).get("id")
                     
-                    # Recorremos la lista de jugadores de ese equipo
                     for p_data in team_entry.get("players", []):
                         p_info = p_data.get("player", {})
-                        # Recorremos las estadisticas
                         for stat in p_data.get("statistics", []):
                             
                             fila = {
@@ -52,14 +47,14 @@ def procesar_jugadores_partido():
                                 "id_jugador": p_info.get("id"),
                                 "id_equipo": id_equipo,
                                 
-                                # Info de juego
+                                # Participación en el partido.
                                 "posicion": traducir_posicion(stat.get("games", {}).get("position")),
                                 "minutos": stat.get("games", {}).get("minutes"),
                                 "nota": stat.get("games", {}).get("rating"),
                                 "capitan": stat.get("games", {}).get("captain"),
                                 "sustituto": stat.get("games", {}).get("substitute"),
                                 
-                                # Estadísticas clave
+                                # Rendimiento individual.
                                 "goles": stat.get("goals", {}).get("total"),
                                 "penaltis_marcados": stat.get('penalty', {}).get('scored'),
                                 "asistencias": stat.get("goals", {}).get("assists"),
@@ -90,10 +85,9 @@ def procesar_jugadores_partido():
 
     df = df.sort_values(by=['id_partido', 'id_equipo'], ascending=[True, True])
 
-    # Nota media: de texto "7.3" a decimal 7.3
+    # La nota admite decimales; el resto de estadísticas son recuentos enteros.
     df['nota'] = pd.to_numeric(df['nota'], errors='coerce').fillna(0.0)
     
-    # Columnas que deben ser ENTEROS
     cols_enteros = [
         "id_partido", "id_jugador", "id_equipo", "minutos", "goles", "asistencias", 
         "paradas", "tiros_totales", "tiros_a_puerta", "pases_totales", "pases_clave", 
@@ -105,7 +99,6 @@ def procesar_jugadores_partido():
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
 
-    # Guardar
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     print(f"✅ Procesados {len(df)} registros de jugadores por partido.")
 

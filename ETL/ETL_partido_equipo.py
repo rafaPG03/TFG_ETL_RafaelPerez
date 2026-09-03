@@ -2,7 +2,6 @@ import json
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA" 
 CARPETA_STATS = os.path.join(RUTA_BASE, "partidos_stats")
@@ -43,13 +42,12 @@ def procesar_stats_equipos():
                     fixture_id = game.get("fixture_id")
                     
                     for team_data in game.get("statistics", []):
-                        # Información básica
                         fila = {
                             "id_partido": fixture_id,
                             "id_equipo": team_data["team"]["id"],
                         }
 
-                        # Rellenar con 0 por defecto para evitar NaNs que causan decimales
+                        # Inicializa todas las estadísticas para mantener un esquema estable.
                         for col in MAPEO_STATS.values():
                             fila[col] = 0
                         
@@ -60,29 +58,24 @@ def procesar_stats_equipos():
                             if tipo in MAPEO_STATS:
                                 if isinstance(valor, str) and "%" in valor:
                                     valor = valor.replace("%", "")
-                                # Si el valor es None (nulo en JSON), ponemos 0
                                 fila[MAPEO_STATS[tipo]] = valor if valor is not None else 0
                         rows.append(fila)
 
     df = pd.DataFrame(rows)
 
-    # Columnas que SIEMPRE deben ser decimales (como Goles Esperados xG)
+    # Las métricas de goles esperados conservan decimales.
     cols_decimal = ["goles_esperados"]
     
-    # Columnas que SIEMPRE deben ser enteros
-    # Buscamos todas las columnas excepto id, nombre y las de xG
+    # El resto de estadísticas son recuentos enteros.
     cols_para_enteros = [c for c in df.columns if c not in ["nombre", "id_partido", "id_equipo"] + cols_decimal]
 
     for col in cols_para_enteros:
-        # Convertimos a numérico, lo que no sea número se vuelve NaN, luego 0, luego entero
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
 
-    # Para los decimales (xG), nos aseguramos de que sean float
     for col in cols_decimal:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0).astype(float)
 
-    # Guardar
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     print(f"✅ ETL de Estadísticas finalizado. {len(df)} filas generadas.")
 

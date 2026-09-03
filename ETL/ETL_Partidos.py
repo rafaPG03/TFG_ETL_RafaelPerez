@@ -2,29 +2,25 @@ import json
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA" 
 CARPETA_PARTIDOS = os.path.join(RUTA_BASE, "partidos_base")
-ARCHIVO_SALIDA = os.path.join(DSA, "dim_partidos2.csv")
+ARCHIVO_SALIDA = os.path.join(DSA, "dim_partidos.csv")
 
 def es_partido_acabado(p):
     """Verifica si un partido está completado."""
     try:
-        # Verificar que existen los campos necesarios
         if not p.get('fixture') or not p.get('teams') or not p.get('goals'):
             return False
         
-        # Verificar que fixture tiene datos completos
         if not p['fixture'].get('id') or not p['fixture'].get('date'):
             return False
         
-        # Verificar que teams tiene datos completos
         if (not p['teams'].get('home') or not p['teams'].get('away') or
             not p['teams']['home'].get('id') or not p['teams']['away'].get('id')):
             return False
         
-        # Verificar que goals tiene datos válidos (aunque sean 0)
+        # El cero es un resultado válido; solo se descartan goles nulos.
         if p['goals'].get('home') is None or p['goals'].get('away') is None:
             return False
         
@@ -60,7 +56,6 @@ def procesar_partidos():
             for p in data:
                 acabado = es_partido_acabado(p)
                 
-                # Extraer datos según si el partido está acabado o no
                 if acabado:
                     id_partido = p['fixture']['id']
                     arbitro = p['fixture']['referee']
@@ -74,7 +69,7 @@ def procesar_partidos():
                     goles_local = p['goals']['home']
                     goles_visitante = p['goals']['away']
                 else:
-                    # Para partidos incompletos, intentamos obtener lo que podamos
+                    # Conserva los campos disponibles de los partidos pendientes.
                     id_partido = p.get('fixture', {}).get('id')
                     arbitro = p.get('fixture', {}).get('referee')
                     fecha = p.get('fixture', {}).get('date')
@@ -104,23 +99,20 @@ def procesar_partidos():
                 all_data.append(fila)
 
     df = pd.DataFrame(all_data)
-        # Ordenamos por fecha
     df = df.sort_values(by=['fecha'], ascending=[True])
     
-    # Quitamos ", Spain" del árbitro (si existe)
+    # Elimina el país añadido al nombre del árbitro por la API.
     df['arbitro'] = df['arbitro'].str.replace(", Spain", "", case=False, regex=False)
 
-    # Dejamos solo el número en Jornada (Extrae los dígitos al final del texto)
+    # La jornada se almacena como número entero.
     df['jornada'] = df['jornada'].str.extract('(\d+)', expand=False).astype('Int64')
 
-    # Convertimos goles a entero nullable para evitar que se exporten como float.
+    # Los goles usan enteros anulables para los partidos pendientes.
     df['goles_local'] = pd.to_numeric(df['goles_local'], errors='coerce').astype('Int64')
     df['goles_visitante'] = pd.to_numeric(df['goles_visitante'], errors='coerce').astype('Int64')
 
-    # Formateamos Fecha (solo para fechas válidas)
     df['fecha'] = pd.to_datetime(df['fecha'], errors='coerce').dt.strftime('%Y-%m-%d %H:%M')
 
-    # Guardar en CSV
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     
     completados = (df['status'] == 'Completado').sum()

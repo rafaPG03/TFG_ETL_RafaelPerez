@@ -93,7 +93,7 @@ def normalizar_rango_0_10(df: pd.DataFrame, columnas: list[str]) -> pd.DataFrame
         if pd.isna(maximo) or maximo <= 0:
             df_out[col] = 0.0
         else:
-            # El valor maximo de la columna se convierte en 10.
+            # El valor máximo de la columna se convierte en 10.
             df_out[col] = (serie / maximo) * 10
 
         df_out[col] = df_out[col].clip(0, 10).round(2)
@@ -104,7 +104,7 @@ def normalizar_rango_0_10(df: pd.DataFrame, columnas: list[str]) -> pd.DataFrame
 def normalizar_rango_0_10_por_grupo(
     df: pd.DataFrame, columnas: list[str], columna_grupo: str
 ) -> pd.DataFrame:
-    # Normaliza cada stat al rango [0, 10] dentro de cada grupo (ej. temporada).
+    # Normaliza cada estadística al rango [0, 10] dentro de su grupo.
     df_out = df.copy()
     for col in columnas:
         serie = pd.to_numeric(df_out[col], errors="coerce")
@@ -119,7 +119,7 @@ def anadir_percentiles(df: pd.DataFrame, columnas: list[str]) -> pd.DataFrame:
     df_out = df.copy()
     for col in columnas:
         serie = pd.to_numeric(df_out[col], errors="coerce")
-        # Percentil relativo del jugador en la stat (0-100, mayor es mejor).
+        # Percentil relativo del jugador en la estadística.
         df_out[f"percentil_{col}"] = (serie.rank(method="average", pct=True) * 100).round(2)
 
     return df_out
@@ -131,7 +131,7 @@ def anadir_percentiles_por_grupo(
     df_out = df.copy()
     for col in columnas:
         serie = pd.to_numeric(df_out[col], errors="coerce")
-        # Percentil relativo del jugador dentro de su grupo (ej. temporada).
+        # Percentil relativo del jugador dentro de su grupo.
         df_out[f"percentil_{col}"] = (
             df_out.groupby(columna_grupo)[col]
             .rank(method="average", pct=True)
@@ -167,7 +167,7 @@ def main() -> None:
     columnas_notas = ["ataque", "creacion", "defensa", "porteros", "duelos", "regates"]
     df[columnas_notas] = df.apply(calcular_indices, axis=1)
 
-    # Perfil por jugador y temporada: mantiene un valor distinto por cada temporada.
+    # Mantiene un perfil independiente por jugador y temporada.
     perfil_jugador = (
         df.groupby(["id_jugador", "temporada"], as_index=False)[columnas_notas]
         .mean()
@@ -193,10 +193,10 @@ def main() -> None:
     ]
     perfil_final = perfil_final[columnas_ordenadas]
 
-    # Normalizamos cada rating al rango [0, 10] dentro de cada temporada.
+    # Normaliza cada valoración al rango [0, 10] dentro de la temporada.
     perfil_final = normalizar_rango_0_10_por_grupo(perfil_final, columnas_notas, "temporada")
 
-    # Anadimos percentiles por stat dentro de cada temporada.
+    # Calcula los percentiles de cada estadística dentro de la temporada.
     perfil_final = anadir_percentiles_por_grupo(perfil_final, columnas_notas, "temporada")
 
     columnas_percentiles = [f"percentil_{col}" for col in columnas_notas]

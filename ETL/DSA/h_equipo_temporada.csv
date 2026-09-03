@@ -1,4 +1,5 @@
-﻿id_equipo;temporada;posicion;nombre_equipo;puntos;dg;forma;partidos_jugados;victorias;empates;derrotas;gf;gc;partidos_jugados_local;victorias_local;empates_local;derrotas_local;gf_local;gc_local;partidos_jugados_visitante;victorias_visitante;empates_visitante;derrotas_visitante;gf_visitante;gc_visitante
+﻿#NO USADO EN APP PERO SI PARA LE GENERACIÓN DE LA TABLA
+id_equipo;temporada;posicion;nombre_equipo;puntos;dg;forma;partidos_jugados;victorias;empates;derrotas;gf;gc;partidos_jugados_local;victorias_local;empates_local;derrotas_local;gf_local;gc_local;partidos_jugados_visitante;victorias_visitante;empates_visitante;derrotas_visitante;gf_visitante;gc_visitante
 529;2025;1;Barcelona;52;35;WLWWW;21;17;1;3;57;22;10;10;0;0;31;5;11;7;1;3;26;17
 541;2025;2;Real Madrid;51;28;WWWWW;21;16;3;2;45;17;10;9;0;1;23;6;11;7;3;1;22;11
 530;2025;3;Atletico Madrid;44;21;WWDWW;21;13;5;3;38;17;11;10;1;0;26;7;10;3;4;3;12;10

@@ -16,7 +16,7 @@ ARCHIVO_NECESIDADES = RUTA_DM / "NECESIDADES_REFUERZO_EQUIPO.csv"
 ARCHIVO_PERFILES = RUTA_DM / "perfil_estadistico_jugadores.csv"
 ARCHIVO_GRUPOS_KMEANS = RUTA_DM / "jugadores_similares_top5_por_temporada.csv"
 ARCHIVO_JUGADOR_TEMPORADA = RUTA_DSA / "h_jugador_temporada.csv"
-ARCHIVO_EQUIPO_TEMPORADA = RUTA_DSA / "h_equipo_temporada.csv"
+ARCHIVO_EQUIPO_TEMPORADA = RUTA_DSA / "h_equipo_jornada.csv"
 ARCHIVO_JUGADORES = RUTA_DSA / "dim_jugadores.csv"
 ARCHIVO_SALIDA = RUTA_DM / "fichajes_recomendados_refuerzos.csv"
 
@@ -157,6 +157,20 @@ def cargar_estado_forma(temporada: int) -> pd.DataFrame:
     return pd.DataFrame(columns=["id_jugador", "score_reciente"])
 
 
+def obtener_ultima_clasificacion(equipos_jornada: pd.DataFrame) -> pd.DataFrame:
+    """Conserva la ultima jornada disponible de cada temporada."""
+    equipos_jornada = equipos_jornada.copy()
+    equipos_jornada["jornada"] = pd.to_numeric(
+        equipos_jornada["jornada"], errors="coerce"
+    )
+    equipos_jornada = equipos_jornada.dropna(subset=["jornada"])
+    if equipos_jornada.empty:
+        return equipos_jornada
+
+    ultima_jornada = equipos_jornada.groupby("temporada")["jornada"].transform("max")
+    return equipos_jornada[equipos_jornada["jornada"] == ultima_jornada].copy()
+
+
 def obtener_filas_principales_por_jugador(jugadores_temporada: pd.DataFrame) -> pd.DataFrame:
     jugadores_temporada = jugadores_temporada.copy()
     jugadores_temporada["minutos"] = pd.to_numeric(
@@ -191,14 +205,15 @@ def preparar_datos(argumentos: argparse.Namespace) -> tuple[pd.DataFrame, pd.Dat
     )
     validar_columnas(
         equipos_temporada,
-        ["id_equipo", "temporada", "posicion", "nombre_equipo"],
-        "h_equipo_temporada",
+        ["id_equipo", "temporada", "jornada", "posicion", "nombre_equipo"],
+        "h_equipo_jornada",
     )
     validar_columnas(jugadores, ["id_jugador", "edad"], "dim_jugadores")
 
     for tabla in [necesidades, perfiles, grupos_kmeans, jugadores_temporada, equipos_temporada]:
         tabla["temporada"] = pd.to_numeric(tabla["temporada"], errors="coerce").astype("Int64")
 
+    equipos_temporada = obtener_ultima_clasificacion(equipos_temporada)
     temporada = argumentos.temporada or obtener_temporada_comun_mas_reciente(
         necesidades, perfiles, grupos_kmeans, jugadores_temporada, equipos_temporada
     )

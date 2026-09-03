@@ -3,12 +3,12 @@ import os
 
 # --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA"
-ARCHIVO_PARTIDOS = os.path.join(RUTA_BASE, "dim_partidos2.csv")
+ARCHIVO_PARTIDOS = os.path.join(RUTA_BASE, "dim_partidos.csv")
 ARCHIVO_TIEMPO = os.path.join(RUTA_BASE, "dim_tiempo.csv")
 
 
-""" def limpiar_dim_tiempo():
-    Elimina duplicados por día y mantiene solo atributos del día
+def limpiar_dim_tiempo():
+    """Elimina duplicados por día y mantiene solo atributos del día"""
     
     df_tiempo = pd.read_csv(ARCHIVO_TIEMPO, sep=';')
     
@@ -22,7 +22,7 @@ ARCHIVO_TIEMPO = os.path.join(RUTA_BASE, "dim_tiempo.csv")
     # Guardar en CSV
     df_final.to_csv(ARCHIVO_TIEMPO, index=False, sep=';', encoding='utf-8-sig')
     
-    print(f"✅ dim_tiempo limpiada. Registros únicos: {len(df_final)}") """
+    print(f"✅ dim_tiempo limpiada. Registros únicos: {len(df_final)}") 
 
 
 def preparar_dim_partidos():
@@ -58,6 +58,6 @@ def preparar_dim_partidos():
 
 
 if __name__ == "__main__":
-    """ limpiar_dim_tiempo() """
+    limpiar_dim_tiempo()
     preparar_dim_partidos()
     print("\n✅ Proceso completado exitosamente")

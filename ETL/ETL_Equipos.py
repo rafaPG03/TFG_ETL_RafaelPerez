@@ -2,7 +2,6 @@ import json
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA" 
 CARPETA_EQUIPOS = os.path.join(RUTA_BASE, "equipos_base")
@@ -35,7 +34,6 @@ def procesar_equipos():
 
     df = pd.DataFrame(all_data)
 
-    # Guardar en CSV
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     
     print(f"✅ ETL Completado. Se han procesado {len(df)} registros de equipos.")

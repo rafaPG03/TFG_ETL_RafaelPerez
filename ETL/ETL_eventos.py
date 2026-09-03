@@ -2,7 +2,6 @@ import json
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
 RUTA_BASE = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\DATOS"
 DSA = r"C:\Users\rafa-\OneDrive\Escritorio\ESI\TFG\ETL\DSA"
 CARPETA_EVENTOS = os.path.join(RUTA_BASE, "partidos_eventos")
@@ -58,13 +57,12 @@ mapeo_eventos = {
 }
 
 def traducir_eventos(evento):
-    """Traduce la posición del inglés al español"""
+    """Traduce el tipo o detalle de un evento al español."""
     if evento is None:
         return None
     return mapeo_eventos.get(evento, evento)
 
 def etl_eventos():
-    # Buscamos todos los archivos JSON en la carpeta de eventos
     if not os.path.exists(CARPETA_EVENTOS):
         print(f"No se encuentra la carpeta: {CARPETA_EVENTOS}")
         return
@@ -80,13 +78,11 @@ def etl_eventos():
             except:
                 continue
 
-            # Iteramos por cada partido en el JSON
             for partido in data:
                 f_id = partido.get("fixture_id")
                 eventos = partido.get("events", [])
 
                 for e in eventos:
-                    # Extraemos la información de forma plana
                     fila = {
                         "id_partido": f_id,
                         "minuto": e.get("time", {}).get("elapsed"),
@@ -104,23 +100,19 @@ def etl_eventos():
         print("⚠️ No se encontraron eventos para procesar.")
         return
 
-    # Crear DataFrame
     df = pd.DataFrame(todos_los_eventos)
 
-    # Convertir IDs a enteros 
+    # Los identificadores nulos se representan como cero en el CSV final.
     cols_ids = ["id_partido", "id_equipo", "id_jugador", "id_asistente_o_sale"]
     for col in cols_ids:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
 
-    # El minuto también debe ser entero
     df['minuto'] = pd.to_numeric(df['minuto'], errors='coerce').fillna(0).astype(int)
     df['extra'] = pd.to_numeric(df['extra'], errors='coerce').fillna(0).astype(int)
 
 
-    # Ordenar por partido y minuto para que el CSV sea legible
     df = df.sort_values(by=["id_partido", "minuto"])
 
-    # Guardar CSV
     df.to_csv(ARCHIVO_SALIDA, index=False, sep=';', encoding='utf-8-sig')
     print(f"✅ ETL de Eventos completado. {len(df)} eventos guardados en: {ARCHIVO_SALIDA}")
 

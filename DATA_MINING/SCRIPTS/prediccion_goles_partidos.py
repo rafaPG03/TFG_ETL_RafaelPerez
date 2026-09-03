@@ -15,12 +15,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
-from v3predicccion import cargar_datos, construir_historial_equipos, construir_tabla_caracteristicas
+from predicciones_partidos import cargar_datos, construir_historial_equipos, construir_tabla_caracteristicas
 
 
 RUTA_RAIZ = Path(__file__).resolve().parents[2]
 RUTA_SALIDA = RUTA_RAIZ / "DATA_MINING" / "DSA_DM" / "prediccion_goles_partidos.csv"
-RUTA_METRICAS = RUTA_RAIZ / "DATA_MINING" / "DSA_DM" / "metricas_regresion_goles_partidos.csv"
+RUTA_METRICAS = RUTA_RAIZ / "DATA_MINING" / "METRICAS" / "metricas_regresion_goles_partidos.csv"
 
 OBJETIVOS = ["goles_local", "goles_visitante"]
 

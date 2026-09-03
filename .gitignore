@@ -5,3 +5,6 @@ __pycache__/
 venv/
 *.json
 .DS_Store
+.agents
+.codex
+.vscode

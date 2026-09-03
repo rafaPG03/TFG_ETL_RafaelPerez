@@ -1,4 +1,0 @@
-﻿modelo;accuracy;precision_macro;recall_macro;f1_macro
-RandomForest;0.5081;0.5094;0.5216;0.5096
-SVM;0.4919;0.4836;0.5123;0.4867
-MLP;0.4315;0.4391;0.4331;0.435

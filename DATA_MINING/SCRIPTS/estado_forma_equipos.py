@@ -301,15 +301,6 @@ def main() -> None:
     )
     if salida.empty:
         raise ValueError(f"No hay datos disponibles para la temporada {TEMPORADA_TARGET}")
-
-    archivo_salida = Path(argumentos.output)
-    archivo_salida.parent.mkdir(parents=True, exist_ok=True)
-    salida.to_csv(archivo_salida, index=False, sep=";")
-
-    print(f"Analisis completado. Equipos procesados: {len(salida)}")
-    print(f"Archivo generado: {archivo_salida}")
-    print(salida.to_string(index=False))
-
     temporadas = obtener_temporadas_disponibles(clasificacion)
     resultados_temporadas = [
         calcular_forma_temporada(

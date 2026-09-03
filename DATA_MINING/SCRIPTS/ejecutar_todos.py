@@ -10,16 +10,14 @@ RUTA_SALIDAS = RUTA_SCRIPTS.parent / "DSA_DM"
 
 SCRIPTS_A_EJECUTAR = [
     ("ratings.py", []),
-    ("cargar_perfil_estadistico_jugadores.py", []),
-    ("clasificacion_rendimiento_jugadores.py", []),
     ("similitud_jugadores.py", []),
-    ("Estado_formaV2.py", []),
-    ("forma_jugadorv2.py", []),
+    ("estado_forma_equipos.py", []),
+    ("estado_forma_jugador.py", []),
     ("prob_goleadores.py", []),
     ("aspectos_a_mejorar.py", []),
     ("recomendacion_fichajes_refuerzo.py", []),
     (
-        "v3predicccion.py",
+        "predicciones_partidos.py",
         ["--output", str(RUTA_SALIDAS / "predicciones_partidos_incompletos.csv")],
     ),
     ("prediccion_goles_partidos.py", []),
